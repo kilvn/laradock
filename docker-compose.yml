@@ -668,6 +668,8 @@ services:
         - "${NGINX_HOST_HTTPS_PORT}:443"
       depends_on:
         - php-fpm
+        - php-fpm74
+        - php-fpm56
       labels:
         - "traefik.enable=true"
         - "traefik.http.services.nginx.loadbalancer.server.port=80"
@@ -689,56 +691,8 @@ services:
         - "traefik.http.middlewares.http-redirectscheme.redirectscheme.permanent=true"
         - "traefik.http.middlewares.http-redirectscheme.redirectscheme.scheme=https"
       networks:
-        frontend:
-          aliases:
-            - dev-bm.inboyu.com
-            - dev-cc.inboyu.com
-            - dev-uc.inboyu.com
-            - dev-voc.inboyu.com
-            - dev-op.inboyu.com
-            - dev-dc.inboyu.com
-            - dev.inboyu.com
-            - dev-ec.inboyu.com
-            - dev-vf.inboyu.com
-            - dev-fm.inboyu.com
-            - dev-dgc.inboyu.com
-            - dev-amb.inboyu.com
-            - boyu-platform-test.inboyu.com
-            - dev-platform.inboyu.com
-            - dev-exc.inboyu.com
-            - dev-vm.inboyu.com
-            - dev-am.inboyu.com
-            - dev-md.inboyu.com
-            - dev-qy.inboyu.com
-            - dev-ac.inboyu.com
-            - dev-scc.inboyu.com
-            - dev-api.inboyu.com
-            - data-encryption-service
-        backend:
-          aliases:
-            - dev-bm.inboyu.com
-            - dev-cc.inboyu.com
-            - dev-uc.inboyu.com
-            - dev-voc.inboyu.com
-            - dev-op.inboyu.com
-            - dev-dc.inboyu.com
-            - dev.inboyu.com
-            - dev-ec.inboyu.com
-            - dev-vf.inboyu.com
-            - dev-fm.inboyu.com
-            - dev-dgc.inboyu.com
-            - dev-amb.inboyu.com
-            - boyu-platform-test.inboyu.com
-            - dev-platform.inboyu.com
-            - dev-exc.inboyu.com
-            - dev-vm.inboyu.com
-            - dev-am.inboyu.com
-            - dev-md.inboyu.com
-            - dev-qy.inboyu.com
-            - dev-ac.inboyu.com
-            - dev-scc.inboyu.com
-            - dev-api.inboyu.com
-            - data-encryption-service
+        - frontend
+        - backend
 
 ### OpenResty Server #########################################
     openresty:
