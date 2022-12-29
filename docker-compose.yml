@@ -2434,12 +2434,23 @@ services:
 
 ### hysteria ##################################################
     hysteria:
-      build:
-        context: ./hysteria
-      container_name: hysteria
+      build: ./hysteria
       volumes:
         - ${NGINX_SSL_PATH}:/etc/ssl
         - ./hysteria/config.json:/etc/config.json
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
+
+### alist #####################################################
+    alist:
+      build: ./alist
+      restart: always
+      volumes:
+        - ./alist/data:/opt/alist/data
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      ports:
+        - 5244:5244
+      networks:
+        - backend
