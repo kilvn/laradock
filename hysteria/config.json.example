@@ -1,0 +1,13 @@
+{
+    "listen": ":443",
+    "protocol": "udp",
+    "cert": "",
+    "key": "",
+    "obfs": "",
+    "up_mbps": 300,
+    "down_mbps": 300,
+    "alpn": "h3",
+    "resolver": "tcp://127.0.0.1:53",
+    "resolve_preference": "64",
+    "disable_mtu_discovery": true
+}
