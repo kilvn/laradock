@@ -2441,3 +2441,7 @@ services:
         - ${NGINX_SSL_PATH}:/etc/ssl
         - ./hysteria/config.json:/etc/config.json
       network_mode: "host"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      ports:
+        - "${HYSTERIA_HOST_UDP_PORT}:443"
