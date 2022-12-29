@@ -2439,5 +2439,5 @@ services:
       restart: always
       network_mode: "host"
       volumes:
-        - ./hysteria.json:/etc/hysteria.json
+        - ./hysteria/config.json:/etc/hysteria.json
       command: ["server", "--config", "/etc/hysteria.json"]
