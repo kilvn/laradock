@@ -2452,5 +2452,7 @@ services:
         - TZ=${WORKSPACE_TIMEZONE}
       ports:
         - 5244:5244
+      depends_on:
+        - mariadb
       networks:
         - backend
