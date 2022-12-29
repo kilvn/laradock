@@ -2439,5 +2439,6 @@ services:
       restart: always
       network_mode: "host"
       volumes:
-        - ./hysteria/config.json:/etc/hysteria.json
-      command: ["server", "--config", "/etc/hysteria.json"]
+        - ${NGINX_SSL_PATH}:/etc/ssl
+        - ./hysteria/config.json:/etc/hysteria/config.json
+      command: ["server", "--config", "/etc/hysteria/config.json"]
