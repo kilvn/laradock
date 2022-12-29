@@ -1,3 +1,3 @@
-/data/config.json
-/data/log/*
-/data/tmp/*
+data/config.json
+data/log/*
+data/tmp/*
