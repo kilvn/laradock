@@ -2443,5 +2443,3 @@ services:
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
-      ports:
-        - "${HYSTERIA_HOST_UDP_PORT}:443"
