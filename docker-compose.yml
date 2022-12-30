@@ -2450,6 +2450,9 @@ services:
         - ./alist/data:/opt/alist/data
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
+        - PUID=0
+        - PGID=0
+        - UMASK=022
       ports:
         - 5244:5244
       depends_on:
