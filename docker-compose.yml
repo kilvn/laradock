@@ -2492,3 +2492,28 @@ services:
       networks:
         - frontend
         - backend
+
+### aria2 ###################################################
+    aria2:
+      build: ./aria2
+      restart: always
+      logging:
+        options:
+          max-size: 1m
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+        - PUID=0
+        - PGID=0
+        - RPC_PORT=${ARIA2_RPC_PORT}
+        - LISTEN_PORT=${ARIA2_LISTEN_PORT}
+        - RPC_SECRET=${ARIA2_RPC_SECRET}
+      volumes:
+        - ./aria2/config:/config
+        - ./aria2/downloads:/downloads
+        - ./aria2/.cache/aria2:/.cache/aria2
+      ports:
+        - "${ARIA2_RPC_PORT}:6800"
+        - "${ARIA2_LISTEN_PORT}:6888"
+      networks:
+        - backend
+
