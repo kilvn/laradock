@@ -2533,3 +2533,4 @@ services:
         - TZ=${WORKSPACE_TIMEZONE}
       volumes:
         - ./tuic-server/config.json:/etc/tuic/config.json
+        - ${NGINX_SSL_PATH}:/etc/ssl
