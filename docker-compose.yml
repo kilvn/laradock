@@ -2435,12 +2435,12 @@ services:
 ### hysteria ##################################################
     hysteria:
       build: ./hysteria
-      volumes:
-        - ${NGINX_SSL_PATH}:/etc/ssl
-        - ./hysteria/config.json:/etc/config.json
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ${NGINX_SSL_PATH}:/etc/ssl
+        - ./hysteria/config.json:/etc/config.json
 
 ### alist #####################################################
     alist:
@@ -2514,3 +2514,22 @@ services:
       networks:
         - backend
 
+### tuic-client ##############################################
+    tuic-client:
+      build: ./tuic-client
+      restart: always
+      network_mode: "host"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ./tuic-client/config.json:/etc/tuic/config.json
+
+### tuic-server ##############################################
+    tuic-server:
+      build: ./tuic-server
+      restart: always
+      network_mode: "host"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ./tuic-server/config.json:/etc/tuic/config.json
