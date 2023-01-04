@@ -2449,7 +2449,7 @@ services:
       volumes:
         - ./alist/data:/opt/alist/data
       environment:
-        - TZ=${WORKSPACE_TIMEZONE}
+        - TZ=Asia/Shanghai
         - PUID=0
         - PGID=0
         - UMASK=022
@@ -2497,11 +2497,8 @@ services:
     aria2:
       build: ./aria2
       restart: always
-      logging:
-        options:
-          max-size: 1m
       environment:
-        - TZ=${WORKSPACE_TIMEZONE}
+        - TZ=Asia/Shanghai
         - PUID=0
         - PGID=0
         - RPC_PORT=${ARIA2_RPC_PORT}
