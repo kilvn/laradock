@@ -2531,12 +2531,9 @@ services:
     tuic-server:
       build: ./tuic-server
       restart: always
+      network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
       volumes:
         - ./tuic-server/config.json:/etc/tuic/config.json
         - ${NGINX_SSL_PATH}:/etc/ssl
-      ports:
-        - "${TUIC_SERVER_PORT}:${TUIC_SERVER_PORT}"
-      networks:
-        - backend
