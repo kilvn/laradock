@@ -2537,6 +2537,6 @@ services:
         - ./tuic-server/config.json:/etc/tuic/config.json
         - ${NGINX_SSL_PATH}:/etc/ssl
       ports:
-        - "${TUIC_CLIENT_PORT}:${TUIC_CLIENT_PORT}"
+        - "${TUIC_SERVER_PORT}:${TUIC_SERVER_PORT}"
       networks:
         - backend
