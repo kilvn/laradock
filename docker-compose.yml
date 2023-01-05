@@ -2518,14 +2518,11 @@ services:
     tuic-client:
       build: ./tuic-client
       restart: always
+      network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
       volumes:
         - ./tuic-client/config.json:/etc/tuic/config.json
-      ports:
-        - "${TUIC_CLIENT_PORT}:${TUIC_CLIENT_PORT}"
-      networks:
-        - backend
 
 ### tuic-server ##############################################
     tuic-server:
