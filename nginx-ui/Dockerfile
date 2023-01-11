@@ -25,4 +25,4 @@ RUN echo "upstream php-upstream { server ${NGINX_PHP_UPSTREAM_CONTAINER}:${NGINX
     && echo "upstream php56-upstream { server ${NGINX_PHP56_UPSTREAM_CONTAINER}:${NGINX_PHP_UPSTREAM_PORT}; }" >> /etc/nginx/conf.d/upstream.conf \
     && rm /etc/nginx/conf.d/nginx-ui.conf
 
-EXPOSE 80 443 9100
+EXPOSE 80 443 9000
