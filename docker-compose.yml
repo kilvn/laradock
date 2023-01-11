@@ -2482,7 +2482,7 @@ services:
         - ${NGINX_SSL_PATH}:/etc/nginx/ssl
         - ./nginx-ui/app.ini:/etc/nginx-ui/app.ini
       ports:
-        - "88:9100"
+        - "88:9000"
         - "${NGINX_HOST_HTTP_PORT}:80"
         - "${NGINX_HOST_HTTPS_PORT}:443"
       depends_on:
