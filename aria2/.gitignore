@@ -1,3 +1,4 @@
-config/aria2.session
+config
+!config/script.conf
 
 .DS_Store

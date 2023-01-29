@@ -2457,6 +2457,7 @@ services:
         - 5244:5244
       depends_on:
         - mariadb
+        - aria2
       networks:
         - backend
 
