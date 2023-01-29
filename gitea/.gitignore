@@ -1,0 +1,10 @@
+gitea/conf/*
+gitea/home/*
+gitea/indexers/*
+gitea/jwt/*
+gitea/queues/*
+gitea/tmp/*
+ssh/*
+git/.ssh/authorized_keys
+git/lfs/*
+git/repositories/*

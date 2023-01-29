@@ -2454,7 +2454,7 @@ services:
         - PGID=0
         - UMASK=022
       ports:
-        - 5244:5244
+        - "5244:5244"
       depends_on:
         - mariadb
         - aria2
@@ -2535,3 +2535,29 @@ services:
       volumes:
         - ./tuic-server/config.json:/etc/tuic/config.json
         - ${NGINX_SSL_PATH}:/etc/ssl
+
+### gitea ####################################################
+    gitea:
+      build: ./gitea
+      environment:
+        - USER_UID=1000
+        - USER_GID=1000
+        - GITEA__database__DB_TYPE=mysql
+        - GITEA__database__HOST=mariadb:${MARIADB_PORT}
+        - GITEA__database__NAME=gitea
+        - GITEA__database__USER=${MARIADB_USER}
+        - GITEA__database__PASSWD=${MARIADB_PASSWORD}
+      restart: always
+      volumes:
+        - ./gitea:/data
+        - /root/.ssh/authorized_keys:/data/git/.ssh/authorized_keys
+        - ./gitea:/data
+        - /etc/timezone:/etc/timezone:ro
+        - /etc/localtime:/etc/localtime:ro
+      depends_on:
+        - mariadb
+      ports:
+        - "3200:3000"
+        - "222:22"
+      networks:
+        - backend
