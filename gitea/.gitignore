@@ -5,6 +5,7 @@ gitea/jwt/*
 gitea/queues/*
 gitea/tmp/*
 ssh/*
-git/.ssh/authorized_keys
+git/.ssh
+!git/.ssh/environment
 git/lfs/*
 git/repositories/*
