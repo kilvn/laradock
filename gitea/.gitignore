@@ -1,11 +1,4 @@
-gitea/conf/*
-gitea/home/*
-gitea/indexers/*
-gitea/jwt/*
-gitea/queues/*
-gitea/tmp/*
+gitea/*
 ssh/*
-git/.ssh
+git/*
 !git/.ssh/environment
-git/lfs/*
-git/repositories/*
