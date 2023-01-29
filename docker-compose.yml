@@ -2551,7 +2551,6 @@ services:
       volumes:
         - ./gitea:/data
         - /root/.ssh/authorized_keys:/data/git/.ssh/authorized_keys
-        - ./gitea:/data
         - /etc/timezone:/etc/timezone:ro
         - /etc/localtime:/etc/localtime:ro
       depends_on:
