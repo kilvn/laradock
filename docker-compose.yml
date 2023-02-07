@@ -2574,3 +2574,11 @@ services:
         - ENABLE_GPU=false
         - ENABLE_SMP=true
       restart: always
+
+### wechat-bot ###############################################
+    wechat-bot:
+      build: ./wechat-bot
+      image: whlsoulmate/wechat-bot:latest
+      volumes:
+        - ./wechat-bot/config.js:/app/config.js
+        - ./wechat-bot/.env:/app/.env
