@@ -1,3 +1,9 @@
-config
+downloads/*
+
+config/aria2.conf
+config/aria2.session
+config/dht.dat
+config/dht6.dat
+config/tracker.log
 
 .DS_Store
