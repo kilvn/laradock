@@ -11,7 +11,6 @@ services:
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
       volumes:
-        - ${NGINX_SSL_PATH}:/etc/ssl
         - ./hysteria/hysteria-arm.json:/etc/config.json
 
 ### hysteria-amd ############################################
@@ -23,7 +22,6 @@ services:
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
       volumes:
-        - ${NGINX_SSL_PATH}:/etc/ssl
         - ./hysteria/hysteria-amd.json:/etc/config.json
 
 ### tuic-client ##############################################

@@ -1,0 +1,6 @@
+!config.json
+!Dockerfile
+
+*.json
+
+.DS_Store
