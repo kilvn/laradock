@@ -5,7 +5,6 @@ services:
 ### hysteria-arm ############################################
     hysteria-arm:
       image: tobyxdd/hysteria:latest
-      build: ./hysteria-arm
       command: ["server", "--config", "/etc/config.json"]
       network_mode: "host"
       environment:
@@ -17,7 +16,6 @@ services:
 ### hysteria-amd ############################################
     hysteria-amd:
       image: tobyxdd/hysteria:latest
-      build: ./hysteria-amd
       command: ["server", "--config", "/etc/config.json"]
       network_mode: "host"
       environment:
