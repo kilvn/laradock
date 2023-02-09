@@ -2561,20 +2561,6 @@ services:
       networks:
         - backend
 
-### folding-at-home ##########################################
-    folding-at-home:
-      image: yurinnick/folding-at-home
-      build: ./folding-at-home
-      ports:
-        - '7396:7396'
-        - '36330:36330'
-      environment:
-        - USER=Anonymous
-        - TEAM=0
-        - ENABLE_GPU=false
-        - ENABLE_SMP=true
-      restart: always
-
 ### wechat-bot ###############################################
     wechat-bot:
       build: ./wechat-bot

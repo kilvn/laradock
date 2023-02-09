@@ -1,0 +1,33 @@
+version: '3.5'
+
+services:
+
+### hysteria-arm ##################################################
+    hysteria-arm:
+      build: ./hysteria-arm
+      network_mode: "host"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ${NGINX_SSL_PATH}:/etc/ssl
+        - ./hysteria/hysteria-arm.json:/etc/config.json
+
+### hysteria-amd ##################################################
+    hysteria-amd:
+      build: ./hysteria-amd
+      network_mode: "host"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ${NGINX_SSL_PATH}:/etc/ssl
+        - ./hysteria/hysteria-amd.json:/etc/config.json
+
+### tuic-client ##############################################
+    tuic-client:
+      build: ./tuic-client
+      restart: always
+      network_mode: "host"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ./tuic-client/config.json:/etc/tuic/config.json
