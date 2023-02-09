@@ -2,9 +2,11 @@ version: '3.5'
 
 services:
 
-### hysteria-arm ##################################################
+### hysteria-arm ############################################
     hysteria-arm:
+      image: tobyxdd/hysteria:latest
       build: ./hysteria-arm
+      command: ["server", "--config", "/etc/config.json"]
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
@@ -12,9 +14,11 @@ services:
         - ${NGINX_SSL_PATH}:/etc/ssl
         - ./hysteria/hysteria-arm.json:/etc/config.json
 
-### hysteria-amd ##################################################
+### hysteria-amd ############################################
     hysteria-amd:
+      image: tobyxdd/hysteria:latest
       build: ./hysteria-amd
+      command: ["server", "--config", "/etc/config.json"]
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
