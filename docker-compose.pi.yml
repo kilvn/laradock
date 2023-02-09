@@ -6,7 +6,7 @@ services:
     hysteria-arm:
       container_name: hysteria-arm
       image: tobyxdd/hysteria:latest
-      command: ["server", "--config", "/etc/config.json"]
+      command: ["--config", "/etc/config.json"]
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
@@ -17,7 +17,7 @@ services:
     hysteria-amd:
       container_name: hysteria-amd
       image: tobyxdd/hysteria:latest
-      command: ["server", "--config", "/etc/config.json"]
+      command: ["--config", "/etc/config.json"]
       network_mode: "host"
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
