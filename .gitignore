@@ -24,4 +24,9 @@
 
 docker-compose.custom.yml
 
+docker-compose.go.yml
+/golang
+
+/qinglong/data/*
+
 .DS_Store

@@ -679,26 +679,6 @@ services:
         - php-fpm
         - php-fpm74
         - php-fpm56
-      labels:
-        - "traefik.enable=true"
-        - "traefik.http.services.nginx.loadbalancer.server.port=80"
-        # https router
-        - "traefik.http.routers.https.rule=Host(`${ACME_DOMAIN}`, `www.${ACME_DOMAIN}`)"
-        - "traefik.http.routers.https.entrypoints=https"
-        - "traefik.http.routers.https.middlewares=www-redirectregex"
-        - "traefik.http.routers.https.service=nginx"
-        - "traefik.http.routers.https.tls.certresolver=letsencrypt"
-        # http router
-        - "traefik.http.routers.http.rule=Host(`${ACME_DOMAIN}`, `www.${ACME_DOMAIN}`)"
-        - "traefik.http.routers.http.entrypoints=http"
-        - "traefik.http.routers.http.middlewares=http-redirectscheme"
-        - "traefik.http.routers.http.service=nginx"
-        # middlewares
-        - "traefik.http.middlewares.www-redirectregex.redirectregex.permanent=true"
-        - "traefik.http.middlewares.www-redirectregex.redirectregex.regex=^https://www.(.*)"
-        - "traefik.http.middlewares.www-redirectregex.redirectregex.replacement=https://$$1"
-        - "traefik.http.middlewares.http-redirectscheme.redirectscheme.permanent=true"
-        - "traefik.http.middlewares.http-redirectscheme.redirectscheme.scheme=https"
       networks:
         - frontend
         - backend
@@ -2561,10 +2541,13 @@ services:
       networks:
         - backend
 
-### wechat-bot ###############################################
-    wechat-bot:
-      build: ./wechat-bot
-      image: whlsoulmate/wechat-bot:latest
+### qinglong #################################################
+    qinglong:
+      build: ./qinglong
+      restart: always
       volumes:
-        - ./wechat-bot/config.js:/app/config.js
-        - ./wechat-bot/.env:/app/.env
+        - ./qinglong/data:/ql/data
+      ports:
+        - "5700:5700"
+      networks:
+        - backend
