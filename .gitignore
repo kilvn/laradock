@@ -30,4 +30,6 @@ docker-compose.go.yml
 /qinglong/data/*
 /qinglong/scropt/*
 
+/nacos
+
 .DS_Store
