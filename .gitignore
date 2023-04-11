@@ -28,5 +28,6 @@ docker-compose.go.yml
 /golang
 
 /qinglong/data/*
+/qinglong/scropt/*
 
 .DS_Store

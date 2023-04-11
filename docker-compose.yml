@@ -2547,6 +2547,7 @@ services:
       restart: always
       volumes:
         - ./qinglong/data:/ql/data
+        - ./qinglong/script:/ql/script
       ports:
         - "5700:5700"
       networks:
