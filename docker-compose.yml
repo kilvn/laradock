@@ -2323,14 +2323,14 @@ services:
 
 ### e5_renewx ################################################
     RenewX:
-      image: 'gladtbam/ms365_e5_renewx:latest'
-      build: ./RenewX
+      image: gladtbam/ms365_e5_renewx:latest
+      build: ./renewx
       restart: always
       volumes:
         - ./renewx/deploy:/renewx/Deploy
         - ./renewx/appdata:/renewx/appdata
         - ./renewx/wwwroot/static/Donate.html:/renewx/wwwroot/static/Donate.html
       ports:
-        - '1066:1066'
+        - "1066:1066"
       networks:
         - backend
