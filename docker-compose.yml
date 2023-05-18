@@ -2322,7 +2322,7 @@ services:
         - backend
 
 ### e5_renewx ################################################
-    RenewX:
+    renewx:
       build: ./renewx
       restart: always
       volumes:
