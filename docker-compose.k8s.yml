@@ -548,58 +548,8 @@ services:
         - php-fpm74
         - php-fpm56
       networks:
-#        - frontend
-#        - backend
-        frontend:
-          aliases:
-            - dev-bm.inboyu.com
-            - dev-cc.inboyu.com
-            - dev-uc.inboyu.com
-            - dev-voc.inboyu.com
-            - dev-op.inboyu.com
-            - dev-dc.inboyu.com
-            - dev.inboyu.com
-            - dev-ec.inboyu.com
-            - dev-vf.inboyu.com
-            - dev-fm.inboyu.com
-            - dev-dgc.inboyu.com
-            - dev-amb.inboyu.com
-            - boyu-platform-test.inboyu.com
-            - dev-platform.inboyu.com
-            - dev-exc.inboyu.com
-            - dev-vm.inboyu.com
-            - dev-am.inboyu.com
-            - dev-md.inboyu.com
-            - dev-qy.inboyu.com
-            - dev-ac.inboyu.com
-            - dev-scc.inboyu.com
-            - dev-api.inboyu.com
-            - data-encryption-service
-        backend:
-          aliases:
-            - dev-bm.inboyu.com
-            - dev-cc.inboyu.com
-            - dev-uc.inboyu.com
-            - dev-voc.inboyu.com
-            - dev-op.inboyu.com
-            - dev-dc.inboyu.com
-            - dev.inboyu.com
-            - dev-ec.inboyu.com
-            - dev-vf.inboyu.com
-            - dev-fm.inboyu.com
-            - dev-dgc.inboyu.com
-            - dev-amb.inboyu.com
-            - boyu-platform-test.inboyu.com
-            - dev-platform.inboyu.com
-            - dev-exc.inboyu.com
-            - dev-vm.inboyu.com
-            - dev-am.inboyu.com
-            - dev-md.inboyu.com
-            - dev-qy.inboyu.com
-            - dev-ac.inboyu.com
-            - dev-scc.inboyu.com
-            - dev-api.inboyu.com
-            - data-encryption-service
+        - frontend
+        - backend
 
 ### MariaDB ##############################################
     mariadb:

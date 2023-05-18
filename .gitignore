@@ -23,13 +23,12 @@
 !/.devcontainer/docker-compose.extend-example.yml
 
 docker-compose.custom.yml
-
+docker-compose.local.yml
 docker-compose.go.yml
-/golang
 
 /qinglong/data/*
 /qinglong/scropt/*
 
-/nacos
+nacos
 
 .DS_Store

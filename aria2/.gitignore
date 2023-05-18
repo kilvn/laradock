@@ -1,4 +1,5 @@
-downloads/*
-config/*
+/downloads/*
+/config/*
+/.cache/*
 
 .DS_Store

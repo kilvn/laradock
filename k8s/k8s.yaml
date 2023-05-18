@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: mariadb
   name: mariadb
@@ -23,10 +23,10 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
-  creationTimestamp: null
   labels:
     io.kompose.service: nginx
   name: nginx
@@ -47,6 +47,7 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -71,6 +72,57 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: develope
+  annotations:
+    kompose.cmd: kompose convert -o k8s.yaml
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm74
+  name: php-fpm74
+spec:
+  ports:
+    - name: "9007"
+      port: 9007
+      targetPort: 9007
+    - name: "9000"
+      port: 9000
+      targetPort: 9000
+  selector:
+    io.kompose.service: php-fpm74
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: develope
+  annotations:
+    kompose.cmd: kompose convert -o k8s.yaml
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm56
+  name: php-fpm56
+spec:
+  ports:
+    - name: "9005"
+      port: 9005
+      targetPort: 9005
+    - name: "9000"
+      port: 9000
+      targetPort: 9000
+  selector:
+    io.kompose.service: php-fpm56
+status:
+  loadBalancer: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -92,6 +144,7 @@ status:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -131,6 +184,7 @@ status:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -180,17 +234,20 @@ spec:
       restartPolicy: Always
       volumes:
         - name: mariadb-claim0
-          persistentVolumeClaim:
-            claimName: mariadb-claim0
+          hostPath:
+            path: /Users/kilvn/.laradock/data/mariadb
+            type: Directory
         - name: mariadb-claim1
-          persistentVolumeClaim:
-            claimName: mariadb-claim1
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/mariadb/docker-entrypoint-initdb.d
+            type: Directory
 status: {}
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: mariadb-claim0
@@ -207,6 +264,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: mariadb-claim1
@@ -223,6 +281,7 @@ status: {}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  namespace: develope
   creationTimestamp: null
   name: laradock-backend
 spec:
@@ -239,6 +298,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -275,39 +335,55 @@ spec:
             - containerPort: 443
           resources: {}
           volumeMounts:
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-conf
+              readOnly: true
             - mountPath: /var/www
               name: nginx-claim0
             - mountPath: /var/log/nginx
               name: nginx-claim1
             - mountPath: /etc/nginx/sites-available
               name: nginx-claim2
+              readOnly: true
             - mountPath: /etc/nginx/stream
               name: nginx-claim3
+              readOnly: true
             - mountPath: /etc/nginx/ssl
               name: nginx-claim4
+              readOnly: true
       restartPolicy: Always
       volumes:
+        - name: nginx-conf
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/nginx/nginx.conf
+            type: File
         - name: nginx-claim0
-          persistentVolumeClaim:
-            claimName: nginx-claim0
+          hostPath:
+            path: /Users/kilvn/Documents/web/wwwroot
+            type: Directory
         - name: nginx-claim1
-          persistentVolumeClaim:
-            claimName: nginx-claim1
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/logs/nginx
+            type: Directory
         - name: nginx-claim2
-          persistentVolumeClaim:
-            claimName: nginx-claim2
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/nginx/sites
+            type: Directory
         - name: nginx-claim3
-          persistentVolumeClaim:
-            claimName: nginx-claim3
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/nginx/stream
+            type: Directory
         - name: nginx-claim4
-          persistentVolumeClaim:
-            claimName: nginx-claim4
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/nginx/ssl
+            type: Directory
 status: {}
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: nginx-claim0
@@ -324,6 +400,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: nginx-claim1
@@ -340,6 +417,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: nginx-claim2
@@ -356,6 +434,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: nginx-claim3
@@ -372,6 +451,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: nginx-claim4
@@ -388,6 +468,7 @@ status: {}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  namespace: develope
   creationTimestamp: null
   name: laradock-frontend
 spec:
@@ -404,6 +485,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -453,32 +535,38 @@ spec:
           volumeMounts:
             - mountPath: /usr/local/etc/php/php.ini
               name: php-fpm-claim0
+              readOnly: true
             - mountPath: /var/www
               name: php-fpm-claim1
             - mountPath: /certs/client
               name: docker-in-docker
             - mountPath: /usr/local/etc/php-fpm.d/www.conf
               name: php-fpm-claim3
+              readOnly: true
       restartPolicy: Always
       volumes:
         - name: php-fpm-claim0
-          persistentVolumeClaim:
-            claimName: php-fpm-claim0
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-fpm/php8.2.ini
+            type: File
         - name: php-fpm-claim1
-          persistentVolumeClaim:
-            claimName: php-fpm-claim1
+          hostPath:
+            path: /Users/kilvn/Documents/web/wwwroot
+            type: Directory
         - name: docker-in-docker
           persistentVolumeClaim:
             claimName: docker-in-docker
         - name: php-fpm-claim3
-          persistentVolumeClaim:
-            claimName: php-fpm-claim3
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-fpm/www.conf
+            type: File
 status: {}
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: php-fpm-claim0
@@ -495,6 +583,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: php-fpm-claim1
@@ -511,6 +600,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: docker-in-docker
@@ -527,6 +617,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: php-fpm-claim3
@@ -543,6 +634,271 @@ status: {}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: develope
+  annotations:
+    kompose.cmd: kompose convert -o k8s.yaml
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm74
+  name: php-fpm74
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: php-fpm74
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o k8s.yaml
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/laradock-backend: "true"
+        io.kompose.service: php-fpm74
+    spec:
+      containers:
+        - env:
+            - name: DOCKER_CERT_PATH
+              value: /certs/client
+            - name: DOCKER_HOST
+              value: tcp://docker-in-docker:2376
+            - name: DOCKER_TLS_CERTDIR
+              value: /certs
+            - name: DOCKER_TLS_VERIFY
+              value: "1"
+            - name: FAKETIME
+              value: "-0"
+            - name: PHP_IDE_CONFIG
+              value: serverName=laradock
+            - name: TZ
+              value: PRC
+          image: laradock/php-fpm:latest-7.4
+          name: php-fpm
+          ports:
+            - containerPort: 9007
+            - containerPort: 9000
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/local/etc/php/php.ini
+              name: php-fpm74-claim0
+              readOnly: true
+            - mountPath: /var/www
+              name: php-fpm74-claim1
+            - mountPath: /certs/client
+              name: docker-in-docker
+            - mountPath: /usr/local/etc/php-fpm.d/www.conf
+              name: php-fpm74-claim3
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: php-fpm74-claim0
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-fpm74/php7.4.ini
+            type: File
+        - name: php-fpm74-claim1
+          hostPath:
+            path: /Users/kilvn/Documents/web/wwwroot
+            type: Directory
+        - name: docker-in-docker
+          persistentVolumeClaim:
+            claimName: docker-in-docker
+        - name: php-fpm74-claim3
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-fpm74/www.conf
+            type: File
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: develope
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm74-claim0
+  name: php-fpm74-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: develope
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm74-claim1
+  name: php-fpm74-claim1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: develope
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm74-claim3
+  name: php-fpm74-claim3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: develope
+  annotations:
+    kompose.cmd: kompose convert -o k8s.yaml
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm56
+  name: php-fpm56
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: php-fpm56
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -o k8s.yaml
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/laradock-backend: "true"
+        io.kompose.service: php-fpm56
+    spec:
+      containers:
+        - env:
+            - name: DOCKER_CERT_PATH
+              value: /certs/client
+            - name: DOCKER_HOST
+              value: tcp://docker-in-docker:2376
+            - name: DOCKER_TLS_CERTDIR
+              value: /certs
+            - name: DOCKER_TLS_VERIFY
+              value: "1"
+            - name: FAKETIME
+              value: "-0"
+            - name: PHP_IDE_CONFIG
+              value: serverName=laradock
+            - name: TZ
+              value: PRC
+          image: laradock/php-fpm:latest-5.6
+          name: php-fpm
+          ports:
+            - containerPort: 9007
+            - containerPort: 9000
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/local/etc/php/php.ini
+              name: php-fpm56-claim0
+              readOnly: true
+            - mountPath: /var/www
+              name: php-fpm56-claim1
+            - mountPath: /certs/client
+              name: docker-in-docker
+            - mountPath: /usr/local/etc/php-fpm.d/www.conf
+              name: php-fpm56-claim3
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: php-fpm56-claim0
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-fpm56/php5.6.ini
+            type: File
+        - name: php-fpm56-claim1
+          hostPath:
+            path: /Users/kilvn/Documents/web/wwwroot
+            type: Directory
+        - name: docker-in-docker
+          persistentVolumeClaim:
+            claimName: docker-in-docker
+        - name: php-fpm56-claim3
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-fpm56/www.conf
+            type: File
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: develope
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm56-claim0
+  name: php-fpm56-claim0
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: develope
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm56-claim1
+  name: php-fpm56-claim1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: develope
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php-fpm56-claim3
+  name: php-fpm56-claim3
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+status: {}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -579,14 +935,16 @@ spec:
       restartPolicy: Always
       volumes:
         - name: redis-claim0
-          persistentVolumeClaim:
-            claimName: redis-claim0
+          hostPath:
+            path: /Users/kilvn/.laradock/data/redis
+            type: Directory
 status: {}
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: redis-claim0
@@ -603,6 +961,7 @@ status: {}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: develope
   annotations:
     kompose.cmd: kompose convert -o k8s.yaml
     kompose.version: 1.28.0 (HEAD)
@@ -664,20 +1023,23 @@ spec:
       restartPolicy: Always
       volumes:
         - name: workspace-claim0
-          persistentVolumeClaim:
-            claimName: workspace-claim0
+          hostPath:
+            path: /Users/kilvn/Documents/web/wwwroot
+            type: Directory
         - name: docker-in-docker
           persistentVolumeClaim:
             claimName: docker-in-docker
         - name: workspace-claim2
-          persistentVolumeClaim:
-            claimName: workspace-claim2
+          hostPath:
+            path: /Users/kilvn/Documents/web/laradock/php-worker/supervisord.d
+            type: Directory
 status: {}
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: workspace-claim0
@@ -694,6 +1056,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  namespace: develope
   creationTimestamp: null
   labels:
     io.kompose.service: workspace-claim2
