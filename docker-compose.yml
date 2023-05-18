@@ -2323,7 +2323,6 @@ services:
 
 ### e5_renewx ################################################
     RenewX:
-      image: gladtbam/ms365_e5_renewx:latest
       build: ./renewx
       restart: always
       volumes:
