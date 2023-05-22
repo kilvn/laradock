@@ -627,7 +627,7 @@ services:
           - no_proxy
           - MARIADB_VERSION=${MARIADB_VERSION}
       volumes:
-        - ${DATA_PATH_HOST}/mariadb:/var/lib/mariadb
+        - ${DATA_PATH_HOST}/mariadb:/var/lib/mysql
         - ${MARIADB_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
       restart: always
       ports:
