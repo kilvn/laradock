@@ -26,6 +26,8 @@ docker-compose.custom.yml
 docker-compose.local.yml
 docker-compose.go.yml
 
+/nginx/local.Dockerfile
+
 /qinglong/data/*
 /qinglong/scropt/*
 

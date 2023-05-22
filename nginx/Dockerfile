@@ -27,9 +27,6 @@ RUN set -x ; \
 ARG NGINX_PHP_UPSTREAM_CONTAINER=php-fpm
 ARG NGINX_PHP_UPSTREAM_PORT=9000
 
-ARG NGINX_PHP74_UPSTREAM_CONTAINER=php-fpm74
-ARG NGINX_PHP56_UPSTREAM_CONTAINER=php-fpm56
-
 # Create 'messages' file used from 'logrotate'
 RUN touch /var/log/messages
 
@@ -38,8 +35,6 @@ COPY logrotate/nginx /etc/logrotate.d/
 
 # Set upstream conf and remove the default conf
 RUN echo "upstream php-upstream { server ${NGINX_PHP_UPSTREAM_CONTAINER}:${NGINX_PHP_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf \
-    && echo "upstream php74-upstream { server ${NGINX_PHP74_UPSTREAM_CONTAINER}:${NGINX_PHP_UPSTREAM_PORT}; }" >> /etc/nginx/conf.d/upstream.conf \
-    && echo "upstream php56-upstream { server ${NGINX_PHP56_UPSTREAM_CONTAINER}:${NGINX_PHP_UPSTREAM_PORT}; }" >> /etc/nginx/conf.d/upstream.conf \
     && rm /etc/nginx/conf.d/default.conf
 
 ADD ./startup.sh /opt/startup.sh
