@@ -1,5 +1,3 @@
-version: '3.5'
-
 networks:
   frontend:
     driver: ${NETWORKS_DRIVER}
@@ -130,12 +128,14 @@ services:
           - INSTALL_TERRAFORM=${WORKSPACE_INSTALL_TERRAFORM}
           - INSTALL_DUSK_DEPS=${WORKSPACE_INSTALL_DUSK_DEPS}
           - INSTALL_PG_CLIENT=${WORKSPACE_INSTALL_PG_CLIENT}
+          - PG_CLIENT_VERSION=${POSTGRES_CLIENT_VERSION}
           - INSTALL_PHALCON=${WORKSPACE_INSTALL_PHALCON}
           - INSTALL_SWOOLE=${WORKSPACE_INSTALL_SWOOLE}
           - INSTALL_TAINT=${WORKSPACE_INSTALL_TAINT}
           - INSTALL_LIBPNG=${WORKSPACE_INSTALL_LIBPNG}
           - INSTALL_GRAPHVIZ=${WORKSPACE_INSTALL_GRAPHVIZ}
           - INSTALL_IONCUBE=${WORKSPACE_INSTALL_IONCUBE}
+          - INSTALL_APCU=${WORKSPACE_INSTALL_APCU}
           - INSTALL_MYSQL_CLIENT=${WORKSPACE_INSTALL_MYSQL_CLIENT}
           - INSTALL_PING=${WORKSPACE_INSTALL_PING}
           - INSTALL_SSHPASS=${WORKSPACE_INSTALL_SSHPASS}
@@ -247,6 +247,7 @@ services:
           - INSTALL_MYSQLI=${PHP_FPM_INSTALL_MYSQLI}
           - INSTALL_PGSQL=${PHP_FPM_INSTALL_PGSQL}
           - INSTALL_PG_CLIENT=${PHP_FPM_INSTALL_PG_CLIENT}
+          - PG_CLIENT_VERSION=${POSTGRES_CLIENT_VERSION}
           - INSTALL_POSTGIS=${PHP_FPM_INSTALL_POSTGIS}
           - INSTALL_INTL=${PHP_FPM_INSTALL_INTL}
           - INSTALL_GHOSTSCRIPT=${PHP_FPM_INSTALL_GHOSTSCRIPT}
@@ -345,6 +346,7 @@ services:
           - INSTALL_OCI8=${PHP_WORKER_INSTALL_OCI8}
           - INSTALL_MSSQL=${PHP_WORKER_INSTALL_MSSQL}
           - INSTALL_PHALCON=${PHP_WORKER_INSTALL_PHALCON}
+          - INSTALL_APCU=${PHP_WORKER_INSTALL_APCU}
           - INSTALL_XLSWRITER=${PHP_WORKER_INSTALL_XLSWRITER}
           - INSTALL_SOAP=${PHP_WORKER_INSTALL_SOAP}
           - INSTALL_ZIP_ARCHIVE=${PHP_WORKER_INSTALL_ZIP_ARCHIVE}
@@ -625,7 +627,7 @@ services:
           - no_proxy
           - MARIADB_VERSION=${MARIADB_VERSION}
       volumes:
-        - ${DATA_PATH_HOST}/mariadb:/var/lib/mysql
+        - ${DATA_PATH_HOST}/mariadb:/var/lib/mariadb
         - ${MARIADB_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
       restart: always
       ports:
@@ -658,6 +660,10 @@ services:
         - GITLAB_POSTGRES_USER=${GITLAB_POSTGRES_USER}
         - GITLAB_POSTGRES_PASSWORD=${GITLAB_POSTGRES_PASSWORD}
         - GITLAB_POSTGRES_DB=${GITLAB_POSTGRES_DB}
+        - KEYCLOAK_POSTGRES_INIT=${KEYCLOAK_POSTGRES_INIT}
+        - KEYCLOAK_POSTGRES_USER=${KEYCLOAK_POSTGRES_USER}
+        - KEYCLOAK_POSTGRES_PASSWORD=${KEYCLOAK_POSTGRES_PASSWORD}
+        - KEYCLOAK_POSTGRES_DB=${KEYCLOAK_POSTGRES_DB}
         - JUPYTERHUB_POSTGRES_INIT=${JUPYTERHUB_POSTGRES_INIT}
         - JUPYTERHUB_POSTGRES_USER=${JUPYTERHUB_POSTGRES_USER}
         - JUPYTERHUB_POSTGRES_PASSWORD=${JUPYTERHUB_POSTGRES_PASSWORD}
@@ -1071,6 +1077,7 @@ services:
         - bootstrap.memory_lock=true
         - xpack.security.enabled=false
         - xpack.security.transport.ssl.enabled=false
+        - indices.id_field_data.enabled=true
         - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
         - cluster.initial_master_nodes=laradock-node
       ulimits:
@@ -2181,6 +2188,27 @@ services:
         - frontend
         - backend
       restart: always
+  
+  ### keycloak ##################################################
+    keycloak:
+      image: bitnami/keycloak:${KEYCLOAK_VERSION}
+      ports:
+        - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
+      environment:
+        - KEYCLOAK_HTTP_PORT=${KEYCLOAK_HTTP_PORT}
+        - KEYCLOAK_CREATE_ADMIN_USER=${KEYCLOAK_CREATE_ADMIN_USER}
+        - KEYCLOAK_ADMIN_USER=${KEYCLOAK_ADMIN_USER}
+        - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+        - KEYCLOAK_DATABASE_HOST=${KEYCLOAK_POSTGRES_HOST}
+        - KEYCLOAK_DATABASE_PORT=${POSTGRES_PORT}
+        - KEYCLOAK_DATABASE_NAME=${KEYCLOAK_POSTGRES_DB}
+        - KEYCLOAK_DATABASE_USER=${KEYCLOAK_POSTGRES_USER}
+        - KEYCLOAK_DATABASE_PASSWORD=${KEYCLOAK_POSTGRES_PASSWORD}
+      depends_on:
+        - postgres
+      networks:
+        - frontend
+        - backend
 
 ### hysteria ##################################################
     hysteria:
