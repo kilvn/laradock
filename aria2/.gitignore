@@ -1,5 +1,6 @@
-/downloads/*
-/config/*
-/.cache/*
+downloads/*
+config/*
+!config/script
+!config/*.conf
 
 .DS_Store

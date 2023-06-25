@@ -2371,3 +2371,42 @@ services:
         - "1066:1066"
       networks:
         - backend
+
+### nodestatus ################################################
+    nodestatus:
+      build: ./nodestatus
+      restart: always
+      environment:
+        PORT: 35601
+        DATABASE: ${NODESTATUS_DATABASE}
+        VERBOSE: "false"
+        PING_INTERVAL: 30
+        TZ: Asia/Shanghai
+
+        USE_IPC: ${NODESTATUS_USE_IPC}
+        USE_WEB: ${NODESTATUS_USE_WEB}
+
+        WEB_THEME: "hotaru-theme"
+        WEB_TITLE: "服务器状态"
+        WEB_SUBTITLE: "实时检测服务器存活的探针"
+        WEB_HEADTITLE: "NodeStatus"
+
+        WEB_USERNAME: ${NODESTATUS_WEB_USERNAME}
+        WEB_PASSWORD: ${NODESTATUS_WEB_PASSWORD}
+        WEB_SECRET: ${NODESTATUS_WEB_SECRET}
+
+        PUSH_TIMEOUT: 120
+        PUSH_DELAY: 15
+
+        USE_PUSH: ${NODESTATUS_PUSH_TGBOT}
+        TGBOT_TOKEN: ${NODESTATUS_TGBOT_TOKEN}
+        TGBOT_CHATID: ${NODESTATUS_TGBOT_CHATID}
+        TGBOT_PROXY: ${NODESTATUS_TGBOT_PROXY}
+        TGBOT_WEBHOOK: ${NODESTATUS_TGBOT_WEBHOOK}
+      volumes:
+        - ./nodestatus/server:/usr/local/NodeStatus/server
+        - ./nodestatus/tmp:/tmp:rw
+      ports:
+        - "35601:35601"
+      networks:
+        - backend

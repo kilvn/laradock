@@ -1,0 +1,1 @@
+FROM cokemine/nodestatus:latest
