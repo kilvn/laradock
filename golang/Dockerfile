@@ -11,4 +11,4 @@ RUN git config --global credential.helper '!f() { echo "username=oauth2" ; echo 
 
 CMD ["/bin/bash", "/go/script/build.sh"]
 
-EXPOSE 80 8010 8011
+EXPOSE 8010 8011
