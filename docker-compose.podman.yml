@@ -1,0 +1,97 @@
+networks:
+  frontend:
+    driver: ${NETWORKS_DRIVER}
+  backend:
+    driver: ${NETWORKS_DRIVER}
+volumes:
+  redis:
+    driver: ${VOLUMES_DRIVER}
+  mariadb:
+    driver: ${VOLUMES_DRIVER}
+
+services:
+
+### MariaDB ##############################################
+    mariadb:
+      build:
+        context: ./mariadb
+        args:
+          - http_proxy
+          - https_proxy
+          - no_proxy
+          - MARIADB_VERSION=${MARIADB_VERSION}
+      volumes:
+        - ${DATA_PATH_HOST}/mariadb:/var/lib/mysql
+        - ${MARIADB_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+      restart: always
+      ports:
+        - "${MARIADB_PORT}:3306"
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+        - MYSQL_DATABASE=${MARIADB_DATABASE}
+        - MYSQL_USER=${MARIADB_USER}
+        - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+        - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      networks:
+        - backend
+
+  ### Redis ################################################
+    redis:
+      build: ./redis
+      volumes:
+        - ${DATA_PATH_HOST}/redis:/data
+#      command: --requirepass ${REDIS_PASSWORD}
+      ports:
+        - "${REDIS_PORT}:6379"
+      restart: always
+      networks:
+        - backend
+
+### Portainer ################################################
+    portainer:
+      build:
+        context: ./portainer
+      volumes:
+        - ${DATA_PATH_HOST}/portainer_data:/data
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./portainer/public:/public
+      restart: always
+      extra_hosts:
+        - "dockerhost:${DOCKER_HOST_IP}"
+      ports:
+        - 9010:9000
+      networks:
+        - backend
+
+### aria2 ###################################################
+    aria2:
+      build: ./aria2
+      restart: always
+      environment:
+        - TZ=Asia/Shanghai
+        - PUID=0
+        - PGID=0
+        - RPC_PORT=${ARIA2_RPC_PORT}
+        - LISTEN_PORT=${ARIA2_LISTEN_PORT}
+        - RPC_SECRET=${ARIA2_RPC_SECRET}
+      volumes:
+        - ./aria2/config:/config
+        - ./aria2/downloads:/downloads
+        - ./aria2/.cache/aria2:/.cache/aria2
+      ports:
+        - "${ARIA2_RPC_PORT}:6800"
+        - "${ARIA2_LISTEN_PORT}:6888"
+      networks:
+        - backend
+
+### qinglong #################################################
+    qinglong:
+      build: ./qinglong
+      restart: always
+      volumes:
+        - ./qinglong/data:/ql/data
+        - ./qinglong/script:/ql/script
+      ports:
+        - "5700:5700"
+      networks:
+        - backend
