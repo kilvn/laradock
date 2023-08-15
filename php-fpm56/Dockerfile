@@ -304,7 +304,10 @@ ARG INSTALL_PHPREDIS=false
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-      pecl install -o -f redis-4.3.0; \
+#      pecl install -o -f redis-4.3.0; \
+      printf "\n" | curl 'http://pecl.php.net/get/redis-4.3.0.tgz' -o redis-4.3.0.tgz \
+      && pecl install redis-4.3.0.tgz \
+      && rm -rf -- redis-4.3.0.tgz \
     else \
       pecl install -o -f redis; \
     fi \
@@ -807,8 +810,15 @@ RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
       make install && \
       rm -r /tmp/imagick; \
     else \
-      pecl install imagick; \
-    fi && \
+      if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
+        printf "\n" | curl 'http://pecl.php.net/get/imagick-3.7.0.tgz' -o imagick-3.7.0.tgz; \
+        pecl install imagick-3.7.0.tgz; \
+        rm -r imagick-3.7.0.tgz; \
+        rm -r /tmp/imagick; \
+      else \
+        pecl install imagick; \
+      fi; \
+    fi; \
     docker-php-ext-enable imagick; \
     php -m | grep -q 'imagick' \
 ;fi
@@ -1086,7 +1096,7 @@ ARG INSTALL_CACHETOOL=false
 
 RUN if [ ${INSTALL_CACHETOOL} = true ]; then \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && [ $(php -r "echo PHP_MINOR_VERSION;") -ge 1 ]; then \
-            curl -sO http://gordalina.github.io/cachetool/downloads/cachetool.phar; \
+        curl -sO http://gordalina.github.io/cachetool/downloads/cachetool.phar; \
     else \
         curl http://gordalina.github.io/cachetool/downloads/cachetool-3.2.1.phar -o cachetool.phar; \
     fi && \
