@@ -1,0 +1,33 @@
+networks:
+  frontend:
+    driver: ${NETWORKS_DRIVER}
+  backend:
+    driver: ${NETWORKS_DRIVER}
+
+services:
+
+### golang ##################################################
+  golang:
+    restart: always
+    build:
+      context: ./golang
+      args:
+        - GITLAB_PERSONAL_ACCESS_TOKEN=${GITLAB_PERSONAL_ACCESS_TOKEN}
+        - GOPRIVATE=${GOPRIVATE}
+    ports:
+      - '8010:8010/tcp'
+      - '8011:8011/tcp'
+    environment:
+      - GO111MODULE=on
+      - GOPROXY=https://goproxy.cn,direct
+      - GOPRIVATE=${GOPRIVATE}
+      - GOSUMDB=sum.golang.google.cn
+      - GONOPROXY=${GOPRIVATE}
+      - GONOSUMDB=${GOPRIVATE}
+      - SSH_PATH=~/.ssh
+    volumes:
+      - ./golang/script:/go/script
+      - ${GOPATH}\src:/go/src
+      - ~/.ssh:/root/.ssh
+    networks:
+      - backend
