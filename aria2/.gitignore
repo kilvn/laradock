@@ -1,5 +1,5 @@
-downloads/*
-config/*
+downloads
+config
 !config/script.conf
 
 .DS_Store
