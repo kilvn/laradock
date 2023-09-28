@@ -12,6 +12,8 @@ RUN git config --global credential.helper '!f() { echo "username=oauth2" ; echo 
     # 修复 Windows 下 https 403 问题
     git config --global url."git@$GOPRIVATE:".insteadOf "https://$GOPRIVATE/"
 
+RUN go install github.com/cosmtrek/air@latest
+
 CMD ["/bin/bash", "/go/script/build.sh"]
 
 EXPOSE 8010 8011
