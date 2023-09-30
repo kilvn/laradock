@@ -2410,3 +2410,13 @@ services:
         - "35601:35601"
       networks:
         - backend
+
+### xu-i ######################################################
+    x-ui:
+      build:
+        context: ./x-ui
+      volumes:
+        - ./x-ui/db/:/etc/x-ui/
+        - ${NGINX_SSL_PATH}:/root/cert/
+      restart: always
+      network_mode: host
