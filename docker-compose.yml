@@ -2417,6 +2417,6 @@ services:
         context: ./x-ui
       restart: always
       volumes:
-        - ./xui/db/:/etc/x-ui/
+        - ./x-ui/db/:/etc/x-ui/
         - ${NGINX_SSL_PATH}:/root/cert/
       network_mode: host
