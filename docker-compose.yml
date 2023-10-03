@@ -2413,9 +2413,10 @@ services:
 
 ### xui #######################################################
     xui:
-      build: ./xui
+      build:
+        context: ./x-ui
       restart: always
       volumes:
-        - ./x-ui/db/:/etc/x-ui/
+        - ./xui/db/:/etc/x-ui/
         - ${NGINX_SSL_PATH}:/root/cert/
       network_mode: host
