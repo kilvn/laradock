@@ -2411,9 +2411,9 @@ services:
       networks:
         - backend
 
-### xu-i ######################################################
+### x-ui ######################################################
     x-ui:
-      build: ./x-ui
+      build: ./xui
       restart: always
       volumes:
         - ./x-ui/db/:/etc/x-ui/
