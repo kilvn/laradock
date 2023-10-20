@@ -306,6 +306,8 @@ RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
       pecl install -o -f redis-4.3.0; \
+    elif [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && { [ $(php -r "echo PHP_MINOR_VERSION;") = "0" ] || [ $(php -r "echo PHP_MINOR_VERSION;") = "1" ] ;}; then \
+      pecl install -o -f redis-5.3.7; \
     else \
       pecl install -o -f redis; \
     fi \
@@ -423,8 +425,12 @@ RUN set -eux; \
     if [ ${INSTALL_AMQP} = true ]; then \
       # # Install the amqp extension
       apt-get -yqq install librabbitmq-dev; \
-      if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
-        pecl install amqp-1.11.0beta; \
+      if [ ${LARADOCK_PHP_VERSION} = "7.3" ] \
+        || [ ${LARADOCK_PHP_VERSION} = "7.2" ] \
+        || [ ${LARADOCK_PHP_VERSION} = "7.1" ] \
+        || [ ${LARADOCK_PHP_VERSION} = "7.0" ] \
+        || [ ${LARADOCK_PHP_VERSION} = "5.6" ]; then \
+        pecl install amqp-1.11.0; \
       else \
         pecl install amqp; \
       fi; \
@@ -759,10 +765,14 @@ RUN set -eux; \
       # Add Microsoft repo for Microsoft ODBC Driver 13 for Linux \
       apt-get update \
       && apt-get install -yqq apt-transport-https gnupg lsb-release \
-      && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+      && if [ ${LARADOCK_PHP_VERSION} = "8.1" ] || [ ${LARADOCK_PHP_VERSION} = "8.2" ]; then \
+        curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
+      ;else \
+        curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+      ;fi \
       && curl https://packages.microsoft.com/config/debian/$(lsb_release -rs)/prod.list > /etc/apt/sources.list.d/mssql-release.list \
       && apt-get update -yqq \
-      && ACCEPT_EULA=Y apt-get install -yqq unixodbc unixodbc-dev libgss3 odbcinst msodbcsql17 locales \
+      && ACCEPT_EULA=Y apt-get install -yqq unixodbc unixodbc-dev libgss3 odbcinst msodbcsql18 locales \
       && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
       && ln -sfn /etc/locale.alias /usr/share/locale/locale.alias \
       && locale-gen \
@@ -772,6 +782,10 @@ RUN set -eux; \
         pecl install pdo_sqlsrv-5.6.1 sqlsrv-5.6.1 \
       ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70200" ]; then \
         pecl install pdo_sqlsrv-5.8.1 sqlsrv-5.8.1 \
+      ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70300" ]; then \
+        pecl install pdo_sqlsrv-5.9.0 sqlsrv-5.9.0 \
+      ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70400" ]; then \
+        pecl install pdo_sqlsrv-5.10.1 sqlsrv-5.10.1 \
       ;else \
         pecl install pdo_sqlsrv sqlsrv \
       ;fi \
@@ -804,6 +818,7 @@ ARG IMAGEMAGICK_VERSION=latest
 ENV IMAGEMAGICK_VERSION ${IMAGEMAGICK_VERSION}
 
 RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
+    apt-get update && \
     apt-get install -yqq libmagickwand-dev imagemagick && \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
       cd /tmp && \
@@ -1012,6 +1027,7 @@ USER root
 ARG INSTALL_FFMPEG=false
 
 RUN if [ ${INSTALL_FFMPEG} = true ]; then \
+    apt-get update -y && \
     apt-get -y install ffmpeg \
 ;fi
 
@@ -1036,6 +1052,16 @@ RUN if [ ${INSTALL_AUDIOWAVEFORM} = true ]; then \
    && make install \
 ;fi
 
+#####################################
+# poppler-utils:
+#####################################
+USER root
+
+ARG INSTALL_POPPLER_UTILS=false
+
+RUN if [ ${INSTALL_POPPLER_UTILS} = true ]; then \
+  apt-get -y install poppler-utils antiword \
+;fi
 
 #####################################
 # wkhtmltopdf:
@@ -1044,7 +1070,7 @@ RUN if [ ${INSTALL_AUDIOWAVEFORM} = true ]; then \
 USER root
 
 ARG INSTALL_WKHTMLTOPDF=false
-ARG WKHTMLTOPDF_VERSION=0.12.6-1
+ARG WKHTMLTOPDF_VERSION=0.12.6.1-3
 
 RUN if [ ${INSTALL_WKHTMLTOPDF} = true ]; then \
     ARCH=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) \
@@ -1059,9 +1085,24 @@ RUN if [ ${INSTALL_WKHTMLTOPDF} = true ]; then \
       xfonts-base \
       xfonts-75dpi \
       wget \
-    && wget "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_0.12.6-1.stretch_${ARCH}.deb" \
-    && dpkg -i "wkhtmltox_${WKHTMLTOPDF_VERSION}.stretch_${ARCH}.deb" \
-    && apt -f install \
+    # && cat /etc/os-release \
+    && if [ ${LARADOCK_PHP_VERSION} = "5.6" ] || \
+        [ ${LARADOCK_PHP_VERSION} = "7.0" ]; then \
+      wget "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.stretch_${ARCH}.deb"; \
+      dpkg -i "wkhtmltox_0.12.6-1.stretch_${ARCH}.deb"; \
+    elif [ ${LARADOCK_PHP_VERSION} = "7.1" ] || \
+        [ ${LARADOCK_PHP_VERSION} = "7.2" ] || \
+        [ ${LARADOCK_PHP_VERSION} = "7.3" ] || \
+        [ ${LARADOCK_PHP_VERSION} = "7.4" ]; then \
+      wget "https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.buster_${ARCH}.deb"; \
+      dpkg -i "wkhtmltox_0.12.6-1.buster_${ARCH}.deb"; \
+    elif [ ${LARADOCK_PHP_VERSION} = "8.0" ]; then \
+      wget "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.bullseye_${ARCH}.deb"; \
+      dpkg -i "wkhtmltox_${WKHTMLTOPDF_VERSION}.bullseye_${ARCH}.deb"; \
+    else \
+      wget "https://github.com/wkhtmltopdf/packaging/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}.bookworm_${ARCH}.deb"; \
+      dpkg -i "wkhtmltox_${WKHTMLTOPDF_VERSION}.bookworm_${ARCH}.deb"; \
+    fi \
 ;fi
 
 #####################################
@@ -1131,15 +1172,24 @@ USER root
 ARG INSTALL_PHPDECIMAL=false
 
 RUN if [ ${INSTALL_PHPDECIMAL} = true ]; then \
-    if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-      echo 'decimal not support PHP 5.6'; \
+  if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
+    echo 'decimal not support PHP 5.6'; \
+  else \
+    if [ ${LARADOCK_PHP_VERSION} = "8.1" ] || \
+        [ ${LARADOCK_PHP_VERSION} = "8.2" ]; then \
+      curl -L -o /tmp/mpdecimal.tar.gz "https://www.bytereef.org/software/mpdecimal/releases/mpdecimal-2.5.1.tar.gz"; \
+      mkdir -p /tmp/mpdecimal; \
+      tar -C /tmp/mpdecimal -zxvf /tmp/mpdecimal.tar.gz --strip 1; \
+      cd /tmp/mpdecimal; \
+      ./configure && make && make install; \
     else \
-      apt-get install -yqq libmpdec-dev \
-      && pecl install decimal \
-      && docker-php-ext-enable decimal \
-      && php -m | grep -q 'decimal' \
-    ;fi \
-;fi
+      apt-get install -yqq libmpdec-dev; \
+    fi; \
+    pecl install decimal; \
+    docker-php-ext-enable decimal; \
+    php -m | grep -oiE '^decimal$'; \
+  fi; \
+fi
 
 ###########################################################################
 # zookeeper
@@ -1311,7 +1361,7 @@ USER root
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm /var/log/lastlog /var/log/faillog
+    rm -f /var/log/lastlog /var/log/faillog
 
 # Configure non-root user.
 ARG PUID=1000
