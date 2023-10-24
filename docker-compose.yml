@@ -2448,3 +2448,20 @@ services:
         - ./x-ui/db/:/etc/x-ui/
         - ${NGINX_SSL_PATH}:/root/cert/
       network_mode: host
+
+### wiznote ###################################################
+    wiznote:
+      build:
+        context: ./wiznote
+      restart: always
+      environment:
+        TZ: Asia/Shanghai
+
+      volumes:
+        - './wiznote/data:/wiz/storage'
+        - '/etc/localtime:/etc/localtime'
+      ports:
+        - "18080:80"
+        - "9269:9269/udp"
+      networks:
+        - backend

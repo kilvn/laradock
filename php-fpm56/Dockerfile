@@ -226,6 +226,7 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
   else \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
       pecl install xdebug-2.5.5; \
+#      pecl install http://pecl.php.net/get/xdebug-2.5.5.tgz; \
     else \
       if [ $(php -r "echo PHP_MINOR_VERSION;") = "0" ]; then \
         pecl install xdebug-2.9.0; \
@@ -305,9 +306,7 @@ RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
 #      pecl install -o -f redis-4.3.0; \
-      printf "\n" | curl 'http://pecl.php.net/get/redis-4.3.0.tgz' -o redis-4.3.0.tgz \
-      && pecl install redis-4.3.0.tgz \
-      && rm -rf -- redis-4.3.0.tgz \
+      pecl install http://pecl.php.net/get/redis-4.3.0.tgz; \
     else \
       pecl install -o -f redis; \
     fi \
@@ -811,10 +810,8 @@ RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
       rm -r /tmp/imagick; \
     else \
       if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-        printf "\n" | curl 'http://pecl.php.net/get/imagick-3.7.0.tgz' -o imagick-3.7.0.tgz; \
-        pecl install imagick-3.7.0.tgz; \
-        rm -r imagick-3.7.0.tgz; \
-        rm -r /tmp/imagick; \
+#        pecl install imagick-3.7.0; \
+        pecl install http://pecl.php.net/get/imagick-3.7.0.tgz; \
       else \
         pecl install imagick; \
       fi; \
