@@ -2465,3 +2465,29 @@ services:
         - "9269:9269/udp"
       networks:
         - backend
+
+### adguardhome ###############################################
+    adguardhome:
+      build:
+        context: ./adguardhome
+      restart: always
+      environment:
+        TZ: Asia/Shanghai
+      volumes:
+        - ./adguardhome/work:/opt/adguardhome/work
+        - ./adguardhome/conf:/opt/adguardhome/conf
+      ports:
+        - 54:3000/tcp
+        - 53:53/tcp # DNS
+        - 53:53/udp # DNS
+        - 67:67/tcp # DHCP 服务器
+        - 68:68/tcp # DHCP 服务器
+        - 68:68/udp # DHCP 服务器
+        - 853:853/tcp # DNS-over-TLS 服务器
+        - 784:784/udp # DNS-over-QUIC 服务器
+        - 853:853/udp # DNS-over-QUIC 服务器
+        - 8853:8853/udp # DNS-over-QUIC 服务器
+        - 5443:5443/tcp # DNSCrypt 服务器
+        - 5443:5443/udp # DNSCrypt 服务器
+      networks:
+        - backend
