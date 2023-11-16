@@ -2489,5 +2489,5 @@ services:
         - 8853:8853/udp # DNS-over-QUIC 服务器
         - 5443:5443/tcp # DNSCrypt 服务器
         - 5443:5443/udp # DNSCrypt 服务器
-      networks:
+      network_mode:
         - host
