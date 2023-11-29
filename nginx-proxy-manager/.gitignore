@@ -1,0 +1,6 @@
+data/access/*
+data/custom_ssl/*
+data/logs/*.log
+data/nginx/*.conf
+data/database.sqlite
+data/keys.json

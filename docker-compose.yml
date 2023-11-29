@@ -2490,3 +2490,32 @@ services:
 #        - 5443:5443/tcp # DNSCrypt 服务器
 #        - 5443:5443/udp # DNSCrypt 服务器
       network_mode: host
+
+### nginx-proxy-manager #######################################
+    nginx-proxy-manager:
+      build:
+        context: ./nginx-proxy-manager
+        args:
+          - PHP_UPSTREAM_CONTAINER=${NGINX_PHP_UPSTREAM_CONTAINER}
+          - PHP_UPSTREAM_PORT=${NGINX_PHP_UPSTREAM_PORT}
+          - http_proxy
+          - https_proxy
+          - no_proxy
+      volumes:
+#        - ./nginx-proxy-manager/data:/data
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
+        - ${NGINX_SITES_PATH}:/data/nginx/custom
+        - ${NGINX_STREAM_PATH}:/data/nginx/stream
+        - ${NGINX_SSL_PATH}:/data/nginx/custom_ssl
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      restart: always
+      ports:
+        - "${NGINX_HOST_HTTP_PORT}:80"
+        - "${NGINX_PROXY_MANAGER_PORT}:81"
+        - "${NGINX_HOST_HTTPS_PORT}:443"
+      depends_on:
+        - php-fpm
+      networks:
+        - frontend
+        - backend
