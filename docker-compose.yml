@@ -2519,3 +2519,19 @@ services:
       networks:
         - frontend
         - backend
+
+### minipaint #################################################
+    minipaint:
+      build:
+        context: ./minipaint
+        args:
+          - http_proxy
+          - https_proxy
+          - no_proxy
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      restart: always
+      ports:
+        - "180:8080"
+      networks:
+        - backend
