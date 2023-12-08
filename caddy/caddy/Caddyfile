@@ -1,4 +1,21 @@
 # Docs: https://caddyserver.com/docs/caddyfile
+#{
+#	servers {
+#		protocol {
+#			experimental_http3
+#		}
+#	}
+#}
+
+:80 {
+	respond "I am :80"
+
+	handle_errors {
+		rewrite * /{http.error.status_code}.html
+		file_server
+	}
+}
+
 laradock.test {
 	root * /var/www/public
 	php_fastcgi php-fpm:9000
@@ -6,4 +23,13 @@ laradock.test {
 
 	encode zstd gzip
 	tls internal
+
+	log {
+		output file /var/log/caddy/boyu/laradock.test_access.log {
+			roll_size     100MiB
+			roll_keep     30
+			roll_keep_for 24h
+		}
+		level  INFO
+	}
 }
