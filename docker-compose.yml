@@ -1016,6 +1016,7 @@ services:
         - ${CADDY_CONFIG_PATH}:/etc/caddy
         - ${CADDY_HOST_LOG_PATH}:/var/log/caddy
         - ${DATA_PATH_HOST}:/root/.caddy
+        - ${NGINX_SSL_PATH}:/etc/caddy/ssl
       ports:
         - "${CADDY_HOST_HTTP_PORT}:80"
         - "${CADDY_HOST_HTTPS_PORT}:443"
