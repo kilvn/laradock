@@ -1,5 +1,6 @@
-downloads
-config
+.cache/aria2/*
+downloads/*
+config/*
 !config/script.conf
 
 .DS_Store
