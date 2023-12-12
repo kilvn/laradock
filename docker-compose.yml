@@ -2478,7 +2478,7 @@ services:
       volumes:
         - ./adguardhome/work:/opt/adguardhome/work
         - ./adguardhome/conf:/opt/adguardhome/conf
-        - ${NGINX_SSL_PATH}:/etc/ssl
+        - ~/.acme.sh:/etc/ssl
 #      ports:
 #        - 54:3000/tcp
 #        - 53:53/tcp # DNS
