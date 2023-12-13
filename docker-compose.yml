@@ -2478,7 +2478,7 @@ services:
       volumes:
         - ./adguardhome/work:/opt/adguardhome/work
         - ./adguardhome/conf:/opt/adguardhome/conf
-        - ${NGINX_SSL_PATH}:/etc/ssl
+        - ${NGINX_SSL_PATH}:/opt/adguardhome/ssl
 #      ports:
 #        - 54:3000/tcp
 #        - 53:53/tcp # DNS
