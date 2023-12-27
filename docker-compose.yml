@@ -2564,15 +2564,23 @@ services:
         - ./config.json:/app/data/config.json
       environment:
         # root 密码，用户名为: root
-        - DEFAULT_ROOT_PSW=${FAST_GPT_ROOT_PWD}
+        - DEFAULT_ROOT_PSW=${FASTGPT_ROOT_PWD}
         # 中转地址，如果是用官方号，不需要管。务必加 /v1
-        - OPENAI_BASE_URL=http://one-api/v1
+        - OPENAI_BASE_URL=http://one-api:3000/v1
         - CHAT_API_KEY=${ONE_API_SK}
-        - DB_MAX_LINK=30 # database max link
-        - TOKEN_KEY=any
-        - ROOT_KEY=root_key
-        - FILE_TOKEN_KEY=filetoken
+        - DB_MAX_LINK=${FASTGPT_DB_MAX_LINK} # database max link
+        - TOKEN_KEY=${FASTGPT_TOKEN_KEY}
+        - ROOT_KEY=${FASTGPT_ROOT_KEY}
+        - FILE_TOKEN_KEY=${FASTGPT_FILE_TOKEN_KEY}
+        # mongo 配置，不需要改. 如果连不上，可能需要去掉 ?authSource=admin
+        - MONGODB_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGODB_PORT}/fastgpt?authSource=admin
+        # pg配置. 不需要改
+        - PG_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/postgres
       restart: always
+      depends_on:
+        - one-api
+        - mongo
+        - postgres
       ports:
         - 3011:3000
       networks:
