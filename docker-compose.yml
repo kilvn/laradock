@@ -770,7 +770,7 @@ services:
       networks:
         - backend
 
-  ### ClickHouse #############################################
+### ClickHouse #############################################
     clickhouse:
       build:
         context: ./clickhouse
@@ -801,7 +801,7 @@ services:
 #        - frontend
         - backend
 
-  ### Redis ################################################
+### Redis ################################################
     redis:
       build: ./redis
       volumes:
@@ -2229,7 +2229,7 @@ services:
         - backend
       restart: always
   
-  ### keycloak ##################################################
+### keycloak ##################################################
     keycloak:
       image: bitnami/keycloak:${KEYCLOAK_VERSION}
       ports:
