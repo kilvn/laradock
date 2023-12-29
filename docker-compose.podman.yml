@@ -1,8 +1,3 @@
-networks:
-  frontend:
-    driver: ${NETWORKS_DRIVER}
-  backend:
-    driver: ${NETWORKS_DRIVER}
 volumes:
   redis:
     driver: ${VOLUMES_DRIVER}
@@ -144,8 +139,6 @@ services:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         - docker-in-docker:/certs/client
         - ./php-worker/supervisord.d:/etc/supervisord.d
-      extra_hosts:
-        - "dockerhost:${DOCKER_HOST_IP}"
       ports:
         - "${WORKSPACE_SSH_PORT}:22"
         - "${WORKSPACE_BROWSERSYNC_HOST_PORT}:3000"
@@ -163,9 +156,6 @@ services:
         - DOCKER_TLS_CERTDIR=/certs
         - DOCKER_CERT_PATH=/certs/client
         - CHOKIDAR_USEPOLLING=true
-      networks:
-        - frontend
-        - backend
       links:
         - docker-in-docker
 
@@ -269,8 +259,6 @@ services:
         - "${PHP_FPM_XDEBUG_PORT}:9003"
       expose:
         - "9000"
-      extra_hosts:
-        - "dockerhost:${DOCKER_HOST_IP}"
       restart: always
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
@@ -282,8 +270,6 @@ services:
         - TZ=${WORKSPACE_TIMEZONE}
       depends_on:
         - workspace
-      networks:
-        - backend
       links:
         - docker-in-docker
 
@@ -336,10 +322,6 @@ services:
         - ./php-worker/supervisord.d:/etc/supervisord.d
       depends_on:
         - workspace
-      extra_hosts:
-        - "dockerhost:${DOCKER_HOST_IP}"
-      networks:
-        - backend
 
 ### NGINX Server #########################################
     nginx:
@@ -366,11 +348,6 @@ services:
         - "${NGINX_HOST_HTTPS_PORT}:443"
       depends_on:
         - php-fpm
-      networks:
-        - frontend
-        - backend
-      extra_hosts:
-        - "host.docker.internal:host-gateway"
 
 ### MariaDB ##############################################
     mariadb:
@@ -393,20 +370,17 @@ services:
         - MYSQL_USER=${MARIADB_USER}
         - MYSQL_PASSWORD=${MARIADB_PASSWORD}
         - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-      networks:
-        - backend
 
 ### Redis ################################################
     redis:
       build: ./redis
       volumes:
-        - ${DATA_PATH_HOST}/redis:/data
-#      command: --requirepass ${REDIS_PASSWORD}
+        - type: bind
+          source: ${DATA_PATH_HOST}/redis
+          target: /data
       ports:
         - "${REDIS_PORT}:6379"
       restart: always
-      networks:
-        - backend
 
 ### Portainer ################################################
     portainer:
@@ -416,13 +390,9 @@ services:
         - ${DATA_PATH_HOST}/portainer_data:/data
         - /var/run/docker.sock:/var/run/docker.sock
         - ./portainer/public:/public
-      restart: always
-      extra_hosts:
-        - "dockerhost:${DOCKER_HOST_IP}"
       ports:
         - 9010:9000
-      networks:
-        - backend
+      restart: always
 
 ### Docker-in-Docker ################################################
     docker-in-docker:
@@ -435,8 +405,6 @@ services:
         - docker-in-docker:/certs/client
       expose:
         - 2375
-      networks:
-        - backend
 
 ### aria2 ###################################################
     aria2:
@@ -456,8 +424,6 @@ services:
       ports:
         - "${ARIA2_RPC_PORT}:6800"
         - "${ARIA2_LISTEN_PORT}:6888"
-      networks:
-        - backend
 
 ### qinglong #################################################
     qinglong:
@@ -468,5 +434,3 @@ services:
         - ./qinglong/script:/ql/script
       ports:
         - "5700:5700"
-      networks:
-        - backend
