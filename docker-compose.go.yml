@@ -27,7 +27,7 @@ services:
       - SSH_PATH=~/.ssh
     volumes:
       - ./golang/script:/go/script
-      - ${GOPATH}\src:/go/src
+      - ${GOPATH}/src:/go/src
       - ~/.ssh:/root/.ssh
     networks:
       - backend
