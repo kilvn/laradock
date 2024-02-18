@@ -2585,3 +2585,19 @@ services:
         - 3011:3000
       networks:
         - backend
+
+### webos #####################################################
+    webos:
+      build:
+        context: ./webos
+      stdin_open: true
+      tty: true
+      volumes:
+        - /:/webosMnt
+        - ./webos/rootPath:/webos/api/rootPath
+        - ./webos/apps:/webos/web/apps
+      restart: always
+      ports:
+        - ${WEBOS_PORT}:8088
+      networks:
+        - backend
