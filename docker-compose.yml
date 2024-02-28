@@ -2601,3 +2601,19 @@ services:
         - ${WEBOS_PORT}:8088
       networks:
         - backend
+
+### portainer_agent ###########################################
+    portainer_agent:
+      build:
+        context: ./portainer_agent
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - /var/lib/docker/volumes:/var/lib/docker/volumes
+        - /:/host
+        - ./portainer_agent/data:/data
+      restart: always
+      environment:
+        - EDGE=1
+        - EDGE_ID=${PORTAINER_AGENT_EDGE_ID}
+        - EDGE_KEY=${PORTAINER_AGENT_EDGE_KEY}
+        - EDGE_INSECURE_POLL=1
