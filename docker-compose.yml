@@ -2609,11 +2609,8 @@ services:
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - /var/lib/docker/volumes:/var/lib/docker/volumes
-        - /:/host
-        - ./portainer_agent/data:/data
       restart: always
-      environment:
-        - EDGE=1
-        - EDGE_ID=${PORTAINER_AGENT_EDGE_ID}
-        - EDGE_KEY=${PORTAINER_AGENT_EDGE_KEY}
-        - EDGE_INSECURE_POLL=1
+      ports:
+        - ${PORTAINER_AGENT_PORT}:9001
+      networks:
+        - backend
