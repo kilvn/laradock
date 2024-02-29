@@ -1,1 +1,1 @@
-FROM kilvn/x-ui:latest
+FROM enwaiax/x-ui:alpha-zh
