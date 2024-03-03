@@ -2614,3 +2614,36 @@ services:
         - ${PORTAINER_AGENT_PORT}:9001
       networks:
         - backend
+
+### proxy-pool ################################################
+    proxy-pool:
+      image: jhao104/proxy_pool:latest
+      build:
+        context: ./proxy-pool
+      environment:
+        - DB_CONN=redis://:${REDIS_PASSWORD}@redis:${REDIS_PORT}/${PROXY_POOL_CHANNEL}
+      restart: always
+      depends_on:
+        - redis
+      ports:
+        - ${PROXY_POOL_PORT}:5010
+      networks:
+        - backend
+
+### warp-clash ################################################
+    warp-clash:
+      build:
+        context: ./warp-clash
+      env_file:
+        - ./warp-clash/.env
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+      volumes:
+        - ./warp-clash/config:/app/config
+        - ./warp-clash/account:/app/account
+        - ./logs/warp-clash:/app/logs
+      restart: always
+      ports:
+        - ${WARP_CLASH_PORT}:3000
+      networks:
+        - backend
