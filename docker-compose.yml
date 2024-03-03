@@ -2617,7 +2617,7 @@ services:
 
 ### proxy-pool ################################################
     proxy-pool:
-      image: jhao104/proxy_pool:latest
+      image: kilvn/proxy_pool:latest
       build:
         context: ./proxy-pool
       environment:
