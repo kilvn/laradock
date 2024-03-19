@@ -1,0 +1,2 @@
+FROM jaaksi/sublink:latest
+
