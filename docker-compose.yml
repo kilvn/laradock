@@ -2639,7 +2639,7 @@ services:
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
       volumes:
-#        - ./warp-clash/config:/app/config
+        - ./warp-clash/config:/app/config
         - ./warp-clash/account:/app/account
         - ./logs/warp-clash:/app/logs
       restart: always
