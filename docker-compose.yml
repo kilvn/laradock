@@ -2681,3 +2681,31 @@ services:
         - ${NEKO_EPR}:52000-52100/udp
       networks:
         - backend
+
+### hbbs ######################################################
+    hbbs:
+      image: rustdesk/rustdesk-server:latest
+      build:
+        context: hbbs
+      command: hbbs --key ${RUSTDESK_KEY}
+      volumes:
+        - ./rustdesk/data:/root
+      depends_on:
+        - hbbr
+      restart: always
+      network_mode: "host"
+      # hbbs 监听21115(tcp), 21116(tcp/udp), 21118(tcp)
+      # 21118 忽略
+
+### hbbr ######################################################
+    hbbr:
+      image: rustdesk/rustdesk-server:latest
+      build:
+        context: hbbr
+      command: hbbr --key ${RUSTDESK_KEY}
+      volumes:
+        - ./rustdesk/data:/root
+      restart: always
+      network_mode: "host"
+      # hbbr 监听21117(tcp), 21119(tcp)
+      # 21119 忽略
