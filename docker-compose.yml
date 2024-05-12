@@ -2380,10 +2380,10 @@ services:
 ### qinglong #################################################
     qinglong:
       build: ./qinglong
-      restart: always
       volumes:
         - ./qinglong/data:/ql/data
         - ./qinglong/script:/ql/script
+      restart: always
       ports:
         - "5700:5700"
       networks:
@@ -2395,9 +2395,9 @@ services:
       volumes:
         - ./renewx/deploy:/renewx/Deploy
         - ./renewx/appdata:/renewx/appdata
+        - ./renewx/DataProtection-Keys:/root/.aspnet/DataProtection-Keys/
         - ./renewx/wwwroot/static/Donate.html:/renewx/wwwroot/static/Donate.html
       restart: always
-      privileged: true
       ports:
         - "1066:1066"
       networks:
