@@ -2392,11 +2392,12 @@ services:
 ### e5_renewx ################################################
     renewx:
       build: ./renewx
-      restart: always
       volumes:
         - ./renewx/deploy:/renewx/Deploy
         - ./renewx/appdata:/renewx/appdata
         - ./renewx/wwwroot/static/Donate.html:/renewx/wwwroot/static/Donate.html
+      restart: always
+      privileged: true
       ports:
         - "1066:1066"
       networks:
