@@ -2395,7 +2395,6 @@ services:
       volumes:
         - ./renewx/deploy:/renewx/Deploy
         - ./renewx/appdata:/renewx/appdata
-        - ./renewx/DataProtection-Keys:/root/.aspnet/DataProtection-Keys/
         - ./renewx/wwwroot/static/Donate.html:/renewx/wwwroot/static/Donate.html
       restart: always
       ports:
