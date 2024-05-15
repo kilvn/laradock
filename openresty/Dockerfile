@@ -189,8 +189,8 @@ RUN apk add --no-cache --virtual .build-deps \
 ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/usr/local/openresty/bin
 
 
-ARG PHP_UPSTREAM_CONTAINER=php-fpm
-ARG PHP_UPSTREAM_PORT=9000
+ARG OPENRESTY_PHP_UPSTREAM_CONTAINER=php-fpm
+ARG OPENRESTY_PHP_UPSTREAM_PORT=9000
 
 # Create 'messages' file used from 'logrotate'
 RUN touch /var/log/messages
@@ -199,7 +199,7 @@ RUN touch /var/log/messages
 COPY logrotate/nginx /etc/logrotate.d/
 
 # Set upstream conf and remove the default conf
-RUN echo "upstream php-upstream { server ${PHP_UPSTREAM_CONTAINER}:${PHP_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf
+RUN echo "upstream php-upstream { server ${OPENRESTY_PHP_UPSTREAM_CONTAINER}:${OPENRESTY_PHP_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf
 
 # Copy nginx configuration files
 COPY nginx.conf /etc/nginx/

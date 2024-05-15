@@ -25,7 +25,7 @@
 docker-compose.custom.yml
 docker-compose.local.yml
 
-/nginx/local.Dockerfile
+local.Dockerfile
 
 nacos
 
