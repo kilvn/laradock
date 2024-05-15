@@ -479,9 +479,9 @@ services:
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
         - ${OPENRESTY_HOST_LOG_PATH}:/var/log/nginx
-        - ${OPENRESTY_SITES_PATH}:/etc/nginx/sites-available
-        - ${OPENRESTY_STREAM_PATH}:/etc/nginx/stream
-        - ${OPENRESTY_SSL_PATH}:/etc/nginx/ssl
+        - ${NGINX_SITES_PATH}:/etc/nginx/sites-available
+        - ${NGINX_STREAM_PATH}:/etc/nginx/stream
+        - ${NGINX_SSL_PATH}:/etc/nginx/ssl
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
       ports:
