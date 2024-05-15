@@ -478,12 +478,13 @@ services:
           - no_proxy
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}${APP_CODE_CONTAINER_FLAG}
-        - ${OPENRESTY_HOST_LOG_PATH}:/var/log/nginx
+        - ${NGINX_HOST_LOG_PATH}:/var/log/nginx
         - ${NGINX_SITES_PATH}:/etc/nginx/sites-available
         - ${NGINX_STREAM_PATH}:/etc/nginx/stream
         - ${NGINX_SSL_PATH}:/etc/nginx/ssl
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
+      restart: always
       ports:
         - "${OPENRESTY_HOST_HTTP_PORT}:80"
         - "${OPENRESTY_HOST_HTTPS_PORT}:443"
@@ -492,8 +493,11 @@ services:
         - php-fpm
       networks:
         - frontend
+        - backend
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
 
-### Nacos Server #########################################
+  ### Nacos Server #########################################
 #    nacos:
 #      image: nacos/nacos-server:latest
 #      container_name: nacos-standalone-mysql

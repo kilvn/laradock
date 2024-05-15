@@ -56,9 +56,6 @@ ARG RESTY_CONFIG_OPTIONS_MORE="\
     --user=www-data \
     --group=www-data \
     --with-http_iconv_module \
-    --add-module=/tmp/ngx_brotli-master \
-    --add-module=/tmp/ngx_cache_purge-master \
-    --add-module=/tmp/ngx_http_substitutions_filter_module-master \
     "
 ARG RESTY_LUAJIT_OPTIONS="--with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT'"
 ARG RESTY_PCRE_OPTIONS="--with-pcre-jit"
@@ -172,14 +169,14 @@ RUN apk add --no-cache --virtual .build-deps \
         pcre-${RESTY_PCRE_VERSION}.tar.gz pcre-${RESTY_PCRE_VERSION} \
         openresty-${RESTY_VERSION}.tar.gz openresty-${RESTY_VERSION} \
     && apk del .build-deps \
-    && mkdir -p /etc/nginx/conf.d/ /var/run/openresty
+    && mkdir -p /etc/nginx/conf.d/ /var/run/openresty/
 
 # Add additional binaries into PATH for convenience
 ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/usr/local/openresty/bin
 
 
-ARG OPENRESTY_PHP_UPSTREAM_CONTAINER=php-fpm
-ARG OPENRESTY_PHP_UPSTREAM_PORT=9000
+ARG PHP_UPSTREAM_CONTAINER=php-fpm
+ARG PHP_UPSTREAM_PORT=9000
 
 # Create 'messages' file used from 'logrotate'
 RUN touch /var/log/messages
@@ -188,7 +185,7 @@ RUN touch /var/log/messages
 COPY logrotate/nginx /etc/logrotate.d/
 
 # Set upstream conf and remove the default conf
-RUN echo "upstream php-upstream { server ${OPENRESTY_PHP_UPSTREAM_CONTAINER}:${OPENRESTY_PHP_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf
+RUN echo "upstream php-upstream { server ${PHP_UPSTREAM_CONTAINER}:${PHP_UPSTREAM_PORT}; }" > /etc/nginx/conf.d/upstream.conf
 
 # Copy nginx configuration files
 COPY nginx.conf /etc/nginx/
