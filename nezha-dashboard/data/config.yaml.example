@@ -1,0 +1,13 @@
+debug: false
+httpport: 80
+grpcport: 81
+language: zh_CN
+oauth2:
+  type: "github" #Oauth2 登录接入类型，gitee/github
+  admin: "guest" #管理员列表，填写Github昵称，多个用英文逗号隔开
+  clientid: "065***********f714" # Clientid
+  clientsecret: "1ed7**********************78a3c" #Secret
+site:
+  brand: "NotMing's Watcher" #站点名称
+  cookiename: "nezha-dashboard" #浏览器 Cookie 字段名，可不改
+  theme: "default" #主题
