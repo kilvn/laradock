@@ -2723,6 +2723,8 @@ services:
       restart: always
       volumes:
         - ./nezha-dashboard/data:/dashboard/data
+        - ./nezha-dashboard/template/common:/dashboard/resource/template/common:ro
+        - ./nezha-dashboard/template/theme-custom:/dashboard/resource/template/theme-custom:ro
       ports:
         - ${NEZHA_DASHBOARD_PORT}:80 #面板代理端口
         - ${NEZHA_AGENT_PORT}:81 #安装agent端口
