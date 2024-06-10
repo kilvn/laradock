@@ -70,12 +70,12 @@
                         </div>
                       </div>
                     </div>
-                    <div v-if="server.Host.SwapTotal" class="three wide column">{{tr "SwapUsed"}}</div>
-                    <div v-if="server.Host.SwapTotal" class="thirteen wide column">
+                    <div class="three wide column">{{tr "SwapUsed"}}</div>
+                    <div class="thirteen wide column">
                       <div :class="formatPercent(server.live,server.State.SwapUsed, server.Host.SwapTotal).class">
                         <div class="bar"
                           :style="formatPercent(server.live,server.State.SwapUsed, server.Host.SwapTotal).style">
-                          <small>@#parseInt(server.State?server.State.SwapUsed/server.Host.SwapTotal*100:0)#@%</small>
+                          <small>@#parseInt(server.State&&server.Host.SwapTotal?server.State.SwapUsed/server.Host.SwapTotal*100:0)#@%</small>
                         </div>
                       </div>
                     </div>
