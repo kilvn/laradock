@@ -11,8 +11,8 @@
           @#(group.Tag!==''?group.Tag:'{{tr "Default"}}')#@
         </div>
         <div class="active content">
-          <div class="ui four stackable status cards">
-            <div v-for="server in group.data" :id="server.ID" class="ui card">
+          <div class="ui stackable status cards" :class="server.length > 3 ? 'four' : 'three'">
+            <div v-if="server.length" v-for="server in group.data" :id="server.ID" class="ui card">
               <div class="content" v-if="server.Host" style="margin-top: 10px; padding-bottom: 5px">
                 <div class="header">
                 <i style="width: 22px;border-radius: 4px;" :class="'fi fi-' + server.Host.CountryCode"></i>&nbsp;<i v-if='server.Host.Platform == "darwin"'
@@ -70,8 +70,8 @@
                         </div>
                       </div>
                     </div>
-                    <div class="three wide column">{{tr "SwapUsed"}}</div>
-                    <div class="thirteen wide column">
+                    <div v-if="server.Host.SwapTotal" class="three wide column">{{tr "SwapUsed"}}</div>
+                    <div v-if="server.Host.SwapTotal" class="thirteen wide column">
                       <div :class="formatPercent(server.live,server.State.SwapUsed, server.Host.SwapTotal).class">
                         <div class="bar"
                           :style="formatPercent(server.live,server.State.SwapUsed, server.Host.SwapTotal).style">
