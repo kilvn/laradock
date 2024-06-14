@@ -956,10 +956,10 @@ RUN if [ ${INSTALL_GETTEXT} = true ]; then \
 # Install additional locales:
 ###########################################################################
 
-ARG PHP_FPM_INSTALL_ADDITIONAL_LOCALES=false
+ARG INSTALL_ADDITIONAL_LOCALES=false
 ARG ADDITIONAL_LOCALES
 
-RUN if [ ${PHP_FPM_INSTALL_ADDITIONAL_LOCALES} = true ]; then \
+RUN if [ ${INSTALL_ADDITIONAL_LOCALES} = true ]; then \
     apt-get install -yqq locales \
     && echo '' >> /usr/share/locale/locale.alias \
     && temp="${ADDITIONAL_LOCALES%\"}" \
