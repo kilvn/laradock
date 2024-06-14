@@ -142,7 +142,7 @@ RUN echo "" >> ~/.bashrc && \
 ARG COMPOSER_VERSION=2
 ENV COMPOSER_VERSION ${COMPOSER_VERSION}
 RUN set -eux; \
-      if [ "$COMPOSER_VERSION" = "1" ] || [ "$COMPOSER_VERSION" = "2" ]; then \
+      if [ "$COMPOSER_VERSION" = "1" ] || [ "$COMPOSER_VERSION" = "2" ] || [ "$COMPOSER_VERSION" = "2.2" ]; then \
           composer self-update --${COMPOSER_VERSION}; \
       else \
           composer self-update ${COMPOSER_VERSION}; \
@@ -701,13 +701,8 @@ RUN if [ ${INSTALL_GRAPHVIZ} = true ]; then \
 ARG INSTALL_IONCUBE=false
 
 RUN if [ ${INSTALL_IONCUBE} = true ]; then \
-    if [ ${LARADOCK_PHP_VERSION} = "8.1" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.4" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.3" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.2" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.1" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.0" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "5.6" ]; then \
+    if [ ${LARADOCK_PHP_VERSION} != "8.3" ] \
+      && [ ${LARADOCK_PHP_VERSION} != "8.0" ]; then \
       # Install the php ioncube loader
       curl -L -o /tmp/ioncube_loaders_lin_x86-64.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
       && tar zxpf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
@@ -1135,6 +1130,8 @@ RUN set -eux; \
         pecl install pdo_sqlsrv-5.9.0 sqlsrv-5.9.0 \
       ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70400" ]; then \
         pecl install pdo_sqlsrv-5.10.1 sqlsrv-5.10.1 \
+      ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "80000" ]; then \
+        pecl install pdo_sqlsrv-5.11.1 sqlsrv-5.11.1 \
       ;else \
         pecl install pdo_sqlsrv sqlsrv \
       ;fi && \
@@ -1865,6 +1862,21 @@ RUN if [ ${INSTALL_JDK} = true ]; then \
     && apt-get install -y default-jdk ca-certificates-java \
     && update-ca-certificates -f \
 ;fi
+
+###########################################################################
+# Github CLI:
+###########################################################################
+
+ARG INSTALL_GITHUB_CLI=false
+
+RUN if [ ${INSTALL_GITHUB_CLI} = true ]; then \
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt update \
+    && apt install gh -y \
+;fi
+
 
 #
 #--------------------------------------------------------------------------
