@@ -667,13 +667,8 @@ RUN if [ ${INSTALL_OCI8} = true ]; then \
 ARG INSTALL_IONCUBE=false
 
 RUN if [ ${INSTALL_IONCUBE} = true ]; then \
-    if [ ${LARADOCK_PHP_VERSION} = "8.1" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.4" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.3" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.2" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.1" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "7.0" ] \
-      || [ ${LARADOCK_PHP_VERSION} = "5.6" ]; then \
+    if [ ${LARADOCK_PHP_VERSION} != "8.3" ] \
+      && [ ${LARADOCK_PHP_VERSION} != "8.0" ]; then \
       # Install the php ioncube loader
       curl -L -o /tmp/ioncube_loaders_lin_x86-64.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz \
       && tar zxpf /tmp/ioncube_loaders_lin_x86-64.tar.gz -C /tmp \
@@ -790,6 +785,8 @@ RUN set -eux; \
         pecl install pdo_sqlsrv-5.9.0 sqlsrv-5.9.0 \
       ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "70400" ]; then \
         pecl install pdo_sqlsrv-5.10.1 sqlsrv-5.10.1 \
+      ;elif [ $(php -r "echo PHP_VERSION_ID - PHP_RELEASE_VERSION;") = "80000" ]; then \
+        pecl install pdo_sqlsrv-5.11.1 sqlsrv-5.11.1 \
       ;else \
         pecl install pdo_sqlsrv sqlsrv \
       ;fi \
@@ -1227,8 +1224,8 @@ ARG NEW_RELIC=${NEW_RELIC}
 ARG NEW_RELIC_KEY=${NEW_RELIC_KEY}
 ARG NEW_RELIC_APP_NAME=${NEW_RELIC_APP_NAME}
 
-RUN if [ ${NEW_RELIC} = true ]; then \
-  curl -L http://download.newrelic.com/php_agent/archive/10.13.0.2/newrelic-php5-10.13.0.2-linux.tar.gz | tar -C /tmp -zx && \
+RUN if [ ${NEW_RELIC} = true ] ]; then \
+  curl -L http://download.newrelic.com/php_agent/archive/10.15.0.4/newrelic-php5-10.15.0.4-linux.tar.gz | tar -C /tmp -zx && \
   export NR_INSTALL_USE_CP_NOT_LN=1 && \
   export NR_INSTALL_SILENT=1 && \
   /tmp/newrelic-php5-*/newrelic-install install && \
@@ -1267,6 +1264,20 @@ RUN set -xe; \
     && rm /tmp/ssdb-client-php.tar.gz \
     && docker-php-ext-enable ssdb \
 ;fi
+
+###########################################################################
+# Legacy Openssl Config:
+###########################################################################
+ARG LEGACY_OPENSSL=false
+
+RUN if [ ${LEGACY_OPENSSL} = true ]; then \
+  if openssl version | grep -q "OpenSSL 3"; then \
+    sed -i 's/# providers = provider_sect/providers = provider_sect/g' /etc/ssl/openssl.cnf && \
+    sed -i '$a[provider_sect]\ndefault=default_sect\nlegacy=legacy_sect\n' /etc/ssl/openssl.cnf && \
+    sed -i '$a[default_sect]\nactivate=1\n[legacy_sect]\nactivate=1\n' /etc/ssl/openssl.cnf \
+  ;fi \
+;fi
+
 ###########################################################################
 # Downgrade Openssl:
 ###########################################################################

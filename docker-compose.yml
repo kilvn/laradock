@@ -179,6 +179,7 @@ services:
           - INSTALL_DNSUTILS=${WORKSPACE_INSTALL_DNSUTILS}
           - INSTALL_POPPLER_UTILS=${WORKSPACE_INSTALL_POPPLER_UTILS}
           - INSTALL_JDK=${WORKSPACE_INSTALL_JDK}
+          - INSTALL_GITHUB_CLI=${WORKSPACE_INSTALL_GITHUB_CLI}
           - http_proxy
           - https_proxy
           - no_proxy
@@ -287,6 +288,7 @@ services:
           - INSTALL_SSDB=${PHP_FPM_INSTALL_SSDB}
           - INSTALL_TRADER=${PHP_FPM_INSTALL_TRADER}
           - INSTALL_EVENT=${PHP_FPM_INSTALL_EVENT}
+          - LEGACY_OPENSSL=${PHP_LEGACY_OPENSSL}
           - DOWNGRADE_OPENSSL_TLS_AND_SECLEVEL=${PHP_DOWNGRADE_OPENSSL_TLS_AND_SECLEVEL}
           - DOWNGRADE_OPENSSL_TLS_VERSION=${PHP_DOWNGRADE_OPENSSL_TLS_VERSION}
           - PUID=${PHP_FPM_PUID}
@@ -337,6 +339,7 @@ services:
           - CHANGE_SOURCE=${CHANGE_SOURCE}
           - LARADOCK_PHP_VERSION=${PHP_VERSION}
           - PHALCON_VERSION=${PHALCON_VERSION}
+          - LARADOCK_PHALCON_VERSION=${PHALCON_VERSION}
           - INSTALL_BZ2=${PHP_WORKER_INSTALL_BZ2}
           - INSTALL_GD=${PHP_WORKER_INSTALL_GD}
           - INSTALL_IMAGEMAGICK=${PHP_WORKER_INSTALL_IMAGEMAGICK}
@@ -425,6 +428,9 @@ services:
     soketi:
       build:
         context: ./soketi
+        args:
+          - NODE_VERSION=${SOKETI_NODE_VERSION}
+          - BASE_IMAGE_TAG_PREFIX=${SOKETI_BASE_IMAGE_TAG_PREFIX}
       volumes:
         - ./soketi/config.json:/app/bin/config.json:ro
       ports:
