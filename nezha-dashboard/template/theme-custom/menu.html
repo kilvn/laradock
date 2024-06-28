@@ -27,6 +27,9 @@
                         <i :class="item.icon + ' icon'"></i>@#item.name#@
                         <i class="check icon" v-if="preferredTemplate === item.key"></i>
                     </a>
+                    <a v-if="defaultTemplate === 'custom'" @click="toggleTemplate('custom')" class="item">
+                        <i class="expand icon"></i>Custom
+                    </a>
                 </div>
             </div>
         {{ end }}
@@ -41,6 +44,8 @@
                 <a class="item" @click="logOut({{.Admin.ID}})"><i class="logout icon"></i>{{tr "Logout"}}</a>
             </div>
         </div>
+        {{else}}
+        <a href="/login" class="item right item-right" style="padding-right:1.2rem"><i class="sign-in icon"></i>{{tr "Login"}}</a>
         {{end}}
     </div>
 </div>
