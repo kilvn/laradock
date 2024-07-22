@@ -2463,6 +2463,20 @@ services:
         - ${NGINX_SSL_PATH}:/root/cert/
       network_mode: host
 
+### 3x-ui #####################################################
+    3x-ui:
+      build:
+        context: ./3x-ui
+      stdin_open: true
+      tty: true
+      environment:
+        - XRAY_VMESS_AEAD_FORCED=false
+      restart: always
+      volumes:
+        - ./3x-ui/db/:/etc/x-ui/
+        - ${NGINX_SSL_PATH}:/root/cert/
+      network_mode: host
+
 ### wiznote ###################################################
     wiznote:
       build:
