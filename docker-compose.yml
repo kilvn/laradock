@@ -2760,3 +2760,5 @@ services:
 #        - MYTVSUPER_TOKEN=YOUR_TOKEN
       ports:
         - ${PIXMAN_PORT}:5000
+      networks:
+        - backend
