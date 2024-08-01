@@ -2750,3 +2750,13 @@ services:
         - ${NEZHA_AGENT_PORT}:81 #安装agent端口
       networks:
         - backend
+
+### pixman ####################################################
+    pixman:
+      image: pixman/pixman
+      container_name: pixman
+      restart: always
+#      environment:
+#        - MYTVSUPER_TOKEN=YOUR_TOKEN
+      ports:
+        - ${PIXMAN_PORT}:5000
