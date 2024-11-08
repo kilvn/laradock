@@ -1,4 +1,4 @@
-/deploy/*
-/appdata/*
-/DataProtection-Keys/*
+deploy/*
+appdata/*
+DataProtection-Keys/*
 .DS_Store
