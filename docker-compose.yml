@@ -203,7 +203,6 @@ services:
         - "${WORKSPACE_ANGULAR_CLI_SERVE_HOST_PORT}:4200"
         - "${WORKSPACE_VITE_PORT}:5173"
       tty: true
-      restart: always
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
         - DOCKER_HOST=tcp://docker-in-docker:2376
@@ -325,7 +324,6 @@ services:
         - "9000"
       extra_hosts:
         - "dockerhost:${DOCKER_HOST_IP}"
-      restart: always
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
         - DOCKER_HOST=tcp://docker-in-docker:2376
@@ -478,7 +476,6 @@ services:
         - ${NGINX_SSL_PATH}:/etc/nginx/ssl
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
-      restart: always
       ports:
         - "${NGINX_HOST_HTTP_PORT}:80"
         - "${NGINX_HOST_HTTPS_PORT}:443"
@@ -488,7 +485,7 @@ services:
         - frontend
         - backend
       extra_hosts:
-        - "host.docker.internal:host-gateway"  
+        - "host.docker.internal:host-gateway"
 
 ### OpenResty Server #########################################
     openresty:
@@ -510,7 +507,6 @@ services:
         - ${NGINX_SSL_PATH}:/etc/nginx/ssl
       environment:
         - TZ=${WORKSPACE_TIMEZONE}
-      restart: always
       ports:
         - "${OPENRESTY_HOST_HTTP_PORT}:80"
         - "${OPENRESTY_HOST_HTTPS_PORT}:443"
@@ -678,7 +674,6 @@ services:
       volumes:
         - ${DATA_PATH_HOST}/mariadb:/var/lib/mysql
         - ${MARIADB_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
-      restart: always
       ports:
         - "${MARIADB_PORT}:3306"
       environment:
@@ -854,7 +849,6 @@ services:
 #      command: --requirepass ${REDIS_PASSWORD}
       ports:
         - "${REDIS_PORT}:6379"
-      restart: always
       networks:
         - backend
 
@@ -1382,7 +1376,6 @@ services:
       restart: always
       build:
         context: ./grafana
-      restart: always
       volumes:
         - ${DATA_PATH_HOST}/grafana:/var/lib/grafana
         - ./grafana/grafana.ini:/etc/grafana/grafana.ini
@@ -1642,7 +1635,6 @@ services:
         - ${DATA_PATH_HOST}/portainer_data:/data
         - /var/run/docker.sock:/var/run/docker.sock
         - ./portainer/public:/public
-      restart: always
       extra_hosts:
         - "dockerhost:${DOCKER_HOST_IP}"
       ports:
@@ -2835,5 +2827,35 @@ services:
 #        - MYTVSUPER_TOKEN=YOUR_TOKEN
       ports:
         - ${PIXMAN_PORT}:5000
+      networks:
+        - backend
+
+### m3u-proxy #################################################
+    m3u-proxy:
+      build:
+        context: ./m3u-proxy
+      restart: always
+      volumes:
+        - ./m3u-proxy/data/iptv.m3u:/app/iptv.m3u
+        - ./m3u-proxy/data/whitelist.txt:/app/whitelist.txt
+        - ./m3u-proxy/data/ip_whitelist.txt:/app/ip_whitelist.txt
+        - ./m3u-proxy/data/m3u_proxy.log:/app/m3u_proxy.log
+        - ./m3u-proxy/data/security_config.json:/app/security_config.json
+      environment:
+#        - PROXY_SERVER=http://您的服务器:5001  # 设置代理服务器地址为您的服务器IP
+        - DEBUG_MODE=False
+        - ENABLE_IP_WHITELIST=False
+        - CONSOLE_LOG_ENABLED=True
+        - LOG_LEVEL=INFO
+        - ORIGINAL_M3U_PATH=/app/iptv.m3u
+        - WHITE_LIST_PATH=/app/whitelist.txt
+        - IP_WHITELIST_PATH=/app/ip_whitelist.txt
+        - LOG_FILE_PATH=/app/m3u_proxy.log
+        - PORT=5612  # 保持这个不变,因为它是容器内部的端口
+        - HOST=0.0.0.0
+        - ADMIN_USERNAME=${M3U_PROXY_ADMIN_USERNAME}  # 设置管理员用户名
+        - ADMIN_PASSWORD=${M3U_PROXY_ADMIN_PASSWORD}  # 设置管理员密码
+      ports:
+        - ${M3U_PROXY_PORT}:5612
       networks:
         - backend
