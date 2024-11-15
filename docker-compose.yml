@@ -2711,8 +2711,7 @@ services:
 ### proxy-pool ################################################
     proxy-pool:
       image: kilvn/proxy_pool:latest
-      build:
-        context: ./proxy-pool
+      container_name: proxy-pool
       environment:
         - DB_CONN=redis://:${REDIS_PASSWORD}@redis:${REDIS_PORT}/${PROXY_POOL_CHANNEL}
       restart: always
@@ -2764,7 +2763,7 @@ services:
         NEKO_EPR: ${NEKO_EPR}
         NEKO_ICELITE: 1
         NEKO_VIDEO_CODEC: h264
-        NEKO_PROXY: true
+        NEKO_PROXY: 1
         NEKO_NAT1TO1: 127.0.0.1
       cap_add:
         - SYS_ADMIN
@@ -2778,8 +2777,7 @@ services:
 ### hbbs ######################################################
     hbbs:
       image: rustdesk/rustdesk-server:latest
-      build:
-        context: hbbs
+      container_name: hbbs
       command: hbbs --key ${RUSTDESK_KEY}
       volumes:
         - ./rustdesk/data:/root
@@ -2793,8 +2791,7 @@ services:
 ### hbbr ######################################################
     hbbr:
       image: rustdesk/rustdesk-server:latest
-      build:
-        context: hbbr
+      container_name: hbbr
       command: hbbr --key ${RUSTDESK_KEY}
       volumes:
         - ./rustdesk/data:/root
