@@ -1,3 +1,2 @@
 *.conf
 !default.conf
-!stream_default.conf

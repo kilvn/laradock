@@ -1,0 +1,16 @@
+{
+    "server": "[::]:12345",
+    "users": {
+        "uuid": "password"
+    },
+    "certificate": "/etc/ssl/x.com.cer",
+    "private_key": "/etc/ssl/x.com.key",
+    "congestion_control": "cubic",
+    "alpn": ["h3", "spdy/3.1"],
+    "udp_relay_ipv6": true,
+    "zero_rtt_handshake": false,
+    "dual_stack": true,
+    "send_window": 16777216,
+    "receive_window": 8388608,
+    "log_level": "warn"
+}

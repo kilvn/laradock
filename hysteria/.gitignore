@@ -1,6 +1,4 @@
-!config.json
-!Dockerfile
-
-*.json
+config.json
+!.example
 
 .DS_Store
