@@ -2881,3 +2881,23 @@ services:
         - ${PUTER_PORT}:4100
       networks:
         - backend
+
+### plex ######################################################
+    plex:
+      build:
+        context: ./plex
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Asia/Shanghai
+        - VERSION=docker
+        - PLEX_CLAIM=${PLEX_CLAIM}
+      volumes:
+        - ./plex/data/library:/config
+        - ./plex/data/tvseries:/transcode
+        - ./plex/data/movies:/data
+      restart: always
+      ports:
+        - ${PLEX_PORT}:32400
+      networks:
+        - backend
