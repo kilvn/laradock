@@ -1,1 +1,1 @@
-FROM linuxserver/plex:latest
+FROM linuxserver/plex:version-1.32.8.7639-fb6452ebf
