@@ -4,7 +4,6 @@
     "cert": "/etc/ssl/xxx.com.cer",
     "key": "/etc/ssl/xxx.com.key"
   },
-  "ignoreClientBandwidth": true,
   "auth": {
     "type": "userpass",
     "userpass": {
