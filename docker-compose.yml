@@ -2896,6 +2896,7 @@ services:
         - ./plex/data/library:/config
         - ./plex/data/tvseries:/transcode
         - ${PLEX_STORAGE_PATH}:/data
+        - ${NGINX_SSL_PATH}:/etc/ssl/certs/custom
       restart: always
       ports:
         - ${PLEX_PORT}:32400
