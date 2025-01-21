@@ -2895,7 +2895,7 @@ services:
       volumes:
         - ./plex/data/library:/config
         - ./plex/data/tvseries:/transcode
-        - /mnt/alist/:/data
+        - ${PLEX_STORAGE_PATH}:/data
       restart: always
       ports:
         - ${PLEX_PORT}:32400
