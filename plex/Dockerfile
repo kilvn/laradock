@@ -1,1 +1,1 @@
-FROM linuxserver/plex:1.32.8
+FROM linuxserver/plex:latest
