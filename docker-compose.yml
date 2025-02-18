@@ -2893,10 +2893,10 @@ services:
         - VERSION=docker
         - PLEX_CLAIM=${PLEX_CLAIM}
       volumes:
-        - ./plex/data/library:/config
-        - ./plex/data/tvseries:/transcode
-        - ${PLEX_STORAGE_PATH}:/data
-        - ${NGINX_SSL_PATH}:/etc/ssl/custom
+        - ./plex/data/library:/config:shared
+        - ./plex/data/tvseries:/transcode:shared
+        - ${PLEX_STORAGE_PATH}:/data:rslave
+        - ${NGINX_SSL_PATH}:/etc/ssl/custom:rslave
       restart: always
       ports:
         - ${PLEX_PORT}:32400
