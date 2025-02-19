@@ -2941,6 +2941,8 @@ services:
         context: ./aliyundrive-subscribe
       volumes:
         - ./aliyundrive-subscribe/conf:/app/conf
+      ports:
+        - 8002:8002
       restart: always
       networks:
         - backend
