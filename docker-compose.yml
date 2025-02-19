@@ -2910,7 +2910,7 @@ services:
       build:
         context: ./moviepilot
       volumes:
-        - ${PLEX_STORAGE_PATH}:/media
+        - ./moviepilot/media:/media
         - ./moviepilot/config:/config
         - ./moviepilot/core:/moviepilot/.cache/ms-playwright
         - /var/run/docker.sock:/var/run/docker.sock:ro
