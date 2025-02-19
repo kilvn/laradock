@@ -2895,7 +2895,7 @@ services:
       volumes:
         - ./plex/data/library:/config:shared
         - ./plex/data/tvseries:/transcode:shared
-        - ${PLEX_STORAGE_PATH}:/data:rslave
+        - ${PLEX_STORAGE_PATH}:/data:shared
         - ${NGINX_SSL_PATH}:/etc/ssl/custom:rslave
       restart: always
       ports:
