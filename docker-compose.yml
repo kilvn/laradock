@@ -2934,3 +2934,13 @@ services:
         - ${MOVIEPILOT_PORT}:3001
       networks:
         - backend
+
+### aliyundrive-subscribe #####################################
+    aliyundrive-subscribe:
+      build:
+        context: ./aliyundrive-subscribe
+      volumes:
+        - ./aliyundrive-subscribe/conf:/app/conf
+      restart: always
+      networks:
+        - backend
