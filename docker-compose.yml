@@ -2902,3 +2902,35 @@ services:
         - ${PLEX_PORT}:32400
       networks:
         - backend
+
+### moviepilot ################################################
+    moviepilot:
+      stdin_open: true
+      tty: true
+      build:
+        context: ./moviepilot
+      volumes:
+        - ${PLEX_STORAGE_PATH}:/media
+        - ./moviepilot/config:/config
+        - ./moviepilot/core:/moviepilot/.cache/ms-playwright
+        - /var/run/docker.sock:/var/run/docker.sock:ro
+      environment:
+        - NGINX_PORT=3000
+        - PORT=3001
+        - PUID=0
+        - PGID=0
+        - UMASK=000
+        - TZ=Asia/Shanghai
+        - SUPERUSER=${MOVIEPILOT_SUPERUSER}
+        - CACHE_BACKEND_TYPE=redis
+        - CACHE_BACKEND_URL=redis://redis:6379
+        - BIG_MEMORY_MODE=true
+        - DB_WAL_ENABLE=true
+        - TOKENIZED_SEARCH=true
+        - PLUGIN_MARKET=https://github.com/InfinityPacer/MoviePilot-Plugins
+      restart: always
+      ports:
+        - ${MOVIEPILOT_NGINX_PORT}:3000
+        - ${MOVIEPILOT_PORT}:3001
+      networks:
+        - backend
