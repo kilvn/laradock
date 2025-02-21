@@ -2911,6 +2911,7 @@ services:
         context: ./moviepilot
       volumes:
         - ./moviepilot/media:/media
+        - ${PLEX_STORAGE_PATH}:/media/links:shared
         - ./moviepilot/config:/config
         - ./moviepilot/core:/moviepilot/.cache/ms-playwright
         - /var/run/docker.sock:/var/run/docker.sock:ro
