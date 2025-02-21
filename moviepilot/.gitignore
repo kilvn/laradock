@@ -1,2 +1,4 @@
 config/*
 core/*
+media/downloads*
+media/links*

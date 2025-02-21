@@ -2910,7 +2910,7 @@ services:
       build:
         context: ./moviepilot
       volumes:
-        - ./moviepilot/media:/media
+        - ./moviepilot/media/downloads:/media/downloads:shared
         - ${PLEX_STORAGE_PATH}:/media/links:shared
         - ./moviepilot/config:/config
         - ./moviepilot/core:/moviepilot/.cache/ms-playwright
