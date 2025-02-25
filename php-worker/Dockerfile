@@ -244,6 +244,7 @@ RUN set -eux; \
 ARG INSTALL_MYSQL_CLIENT=false
 RUN if [ ${INSTALL_MYSQL_CLIENT} = true ]; then \
   apk --update add mysql-client \
+  mariadb-connector-c \
   ;fi
 
 # Install FFMPEG:
@@ -380,6 +381,10 @@ RUN if [ ${INSTALL_REDIS} = true ]; then \
   # Install Redis Extension
   if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
   printf "\n" | pecl install -o -f redis-4.3.0; \
+  elif [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && { [ $(php -r "echo PHP_MINOR_VERSION;") = "0" ] || [ $(php -r "echo PHP_MINOR_VERSION;") = "1" ] ;}; then \
+  printf "\n" | pecl install -o -f redis-5.3.7; \
+  elif [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && { [ $(php -r "echo PHP_MINOR_VERSION;") = "2" ] || [ $(php -r "echo PHP_MINOR_VERSION;") = "3" ] ;}; then \
+  printf "\n" | pecl install -o -f redis-6.0.2; \
   else \
   printf "\n" | pecl install -o -f redis; \
   fi; \
