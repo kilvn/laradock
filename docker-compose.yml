@@ -2897,6 +2897,8 @@ services:
         - ./plex/data/tvseries:/transcode:shared
         - ${PLEX_STORAGE_PATH}:/data:shared
         - ${NGINX_SSL_PATH}:/etc/ssl/custom:rslave
+      devices:
+        - /dev/dri:/dev/dri
       restart: always
       ports:
         - ${PLEX_PORT}:32400
