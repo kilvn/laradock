@@ -2897,6 +2897,7 @@ services:
         - ./plex/data/tvseries:/transcode:shared
         - ${PLEX_STORAGE_PATH}:/data:shared
         - ${NGINX_SSL_PATH}:/etc/ssl/custom:rslave
+        - ./plex/plugins/chinese-language-pack-for-plex.mo:/usr/lib/plexmediaserver/Resources/locale/zh_CN/LC_MESSAGES/plex.mo # x1ao4 简体中文语言包
       devices:
         - /dev/dri:/dev/dri
       restart: always
