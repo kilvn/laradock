@@ -103,9 +103,7 @@ RUN set -x ; \
     addgroup -g 82 -S www-data ; \
     adduser -u 82 -D -S -G www-data www-data && exit 0 ; exit 1
 
-RUN apk cache clean \
-    && apk update \
-    && apk add --no-cache --virtual .build-deps \
+RUN apk add --no-cache --virtual .build-deps \
         build-base \
         coreutils \
         curl \
