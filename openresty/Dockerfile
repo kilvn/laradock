@@ -9,13 +9,11 @@ FROM ${RESTY_IMAGE_BASE}:${RESTY_IMAGE_TAG}
 LABEL maintainer="Evan Wies <evan@neomantra.net>"
 
 # Docker Build Arguments
-ARG RESTY_VERSION="1.27.1.2"
-ARG RESTY_OPENSSL_VERSION="1.1.1w"
+ARG RESTY_VERSION="1.19.3.2"
+ARG RESTY_OPENSSL_VERSION="1.1.1k"
 ARG RESTY_OPENSSL_PATCH_VERSION="1.1.1f"
-ARG RESTY_OPENSSL_URL_BASE="https://www.openssl.org/source/old/1.1.1"
+ARG RESTY_OPENSSL_URL_BASE="https://www.openssl.org/source"
 ARG RESTY_PCRE_VERSION="8.45"
-ARG RESTY_PCRE_BUILD_OPTIONS="--enable-jit"
-ARG RESTY_PCRE_SHA256="4e6ce03e0336e8b4a3d6c2b70b1c5e18590a5673a98186da90d4f33c23defc09"
 ARG RESTY_J="8"
 ARG RESTY_CONFIG_OPTIONS="\
     --with-compat \
@@ -80,8 +78,6 @@ LABEL resty_openssl_version="${RESTY_OPENSSL_VERSION}"
 LABEL resty_openssl_patch_version="${RESTY_OPENSSL_PATCH_VERSION}"
 LABEL resty_openssl_url_base="${RESTY_OPENSSL_URL_BASE}"
 LABEL resty_pcre_version="${RESTY_PCRE_VERSION}"
-LABEL resty_pcre_build_options="${RESTY_PCRE_BUILD_OPTIONS}"
-LABEL resty_pcre_sha256="${RESTY_PCRE_SHA256}"
 LABEL resty_config_options="${RESTY_CONFIG_OPTIONS}"
 LABEL resty_config_options_more="${RESTY_CONFIG_OPTIONS_MORE}"
 LABEL resty_config_deps="${_RESTY_CONFIG_DEPS}"
@@ -144,20 +140,29 @@ RUN apk add --no-cache --virtual .build-deps \
     && make -j${RESTY_J} install_sw \
     && cd /tmp \
     && curl -fSL https://downloads.sourceforge.net/project/pcre/pcre/${RESTY_PCRE_VERSION}/pcre-${RESTY_PCRE_VERSION}.tar.gz -o pcre-${RESTY_PCRE_VERSION}.tar.gz \
-    && echo "${RESTY_PCRE_SHA256}  pcre-${RESTY_PCRE_VERSION}.tar.gz" | shasum -a 256 --check \
     && tar xzf pcre-${RESTY_PCRE_VERSION}.tar.gz \
     && cd /tmp/pcre-${RESTY_PCRE_VERSION} \
     && ./configure \
         --prefix=/usr/local/openresty/pcre \
         --disable-cpp \
+        --enable-jit \
         --enable-utf \
         --enable-unicode-properties \
-        ${RESTY_PCRE_BUILD_OPTIONS} \
     && make -j${RESTY_J} \
     && make -j${RESTY_J} install \
     && cd /tmp \
     && curl -fSL https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz -o openresty-${RESTY_VERSION}.tar.gz \
     && tar xzf openresty-${RESTY_VERSION}.tar.gz \
+    && curl -fSL https://github.com/grahamedgecombe/nginx-ct/archive/master.tar.gz -o nginx-ct.tar.gz \
+    && tar xzf nginx-ct.tar.gz \
+    && curl -fSL https://github.com/arut/nginx-dav-ext-module/archive/master.tar.gz -o nginx-dav-ext-module.tar.gz \
+    && tar xzf nginx-dav-ext-module.tar.gz \
+    && curl -fSL https://github.com/google/ngx_brotli/archive/master.tar.gz -o ngx_brotli.tar.gz \
+    && tar xzf ngx_brotli.tar.gz \
+    && curl -fSL https://github.com/yaoweibin/ngx_http_substitutions_filter_module/archive/master.tar.gz -o ngx_http_substitutions_filter_module.tar.gz \
+    && tar xzf ngx_http_substitutions_filter_module.tar.gz \
+    && curl -fSL https://github.com/FRiCKLE/ngx_cache_purge/archive/master.tar.gz -o ngx_cache_purge.tar.gz \
+    && tar xzf ngx_cache_purge.tar.gz \
     && cd /tmp/openresty-${RESTY_VERSION} \
     && if [ -n "${RESTY_EVAL_POST_DOWNLOAD_PRE_CONFIGURE}" ]; then eval $(echo ${RESTY_EVAL_POST_DOWNLOAD_PRE_CONFIGURE}); fi \
     && eval ./configure -j${RESTY_J} ${_RESTY_CONFIG_DEPS} ${RESTY_CONFIG_OPTIONS} ${RESTY_CONFIG_OPTIONS_MORE} ${RESTY_LUAJIT_OPTIONS} ${RESTY_PCRE_OPTIONS} \
