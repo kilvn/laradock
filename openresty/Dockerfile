@@ -10,8 +10,8 @@ LABEL maintainer="Evan Wies <evan@neomantra.net>"
 
 # Docker Build Arguments
 ARG RESTY_VERSION="1.27.1.2"
-ARG RESTY_OPENSSL_VERSION="1.1.1w"
-ARG RESTY_OPENSSL_PATCH_VERSION="1.1.1f"
+ARG RESTY_OPENSSL_VERSION="3.5.0"
+ARG RESTY_OPENSSL_PATCH_VERSION="3.5.0"
 ARG RESTY_OPENSSL_URL_BASE="https://www.openssl.org/source"
 ARG RESTY_PCRE_VERSION="8.45"
 ARG RESTY_J="8"
@@ -52,7 +52,6 @@ ARG RESTY_CONFIG_OPTIONS_MORE="\
     --user=www-data \
     --group=www-data \
     --with-http_iconv_module \
-    --add-module=/tmp/nginx-ct-master \
     --add-module=/tmp/nginx-dav-ext-module-master \
     --add-module=/tmp/ngx_brotli-master \
     --add-module=/tmp/ngx_cache_purge-master \
@@ -149,8 +148,6 @@ RUN apk add --no-cache --virtual .build-deps \
     && cd /tmp \
     && curl -fSL https://openresty.org/download/openresty-${RESTY_VERSION}.tar.gz -o openresty-${RESTY_VERSION}.tar.gz \
     && tar xzf openresty-${RESTY_VERSION}.tar.gz \
-    && curl -fSL https://github.com/grahamedgecombe/nginx-ct/archive/master.tar.gz -o nginx-ct.tar.gz \
-    && tar xzf nginx-ct.tar.gz \
     && curl -fSL https://github.com/arut/nginx-dav-ext-module/archive/master.tar.gz -o nginx-dav-ext-module.tar.gz \
     && tar xzf nginx-dav-ext-module.tar.gz \
     && curl -fSL https://github.com/google/ngx_brotli/archive/master.tar.gz -o ngx_brotli.tar.gz \
