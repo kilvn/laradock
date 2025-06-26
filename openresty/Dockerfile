@@ -9,9 +9,9 @@ FROM ${RESTY_IMAGE_BASE}:${RESTY_IMAGE_TAG}
 LABEL maintainer="Evan Wies <evan@neomantra.net>"
 
 # Docker Build Arguments
-ARG RESTY_VERSION="1.19.3.2"
-ARG RESTY_OPENSSL_VERSION="1.1.1k"
-ARG RESTY_OPENSSL_PATCH_VERSION="1.1.1f"
+ARG RESTY_VERSION="1.27.1.2"
+ARG RESTY_OPENSSL_VERSION="3.5.0"
+ARG RESTY_OPENSSL_PATCH_VERSION="3.5.0"
 ARG RESTY_OPENSSL_URL_BASE="https://www.openssl.org/source"
 ARG RESTY_PCRE_VERSION="8.45"
 ARG RESTY_J="8"
@@ -37,12 +37,9 @@ ARG RESTY_CONFIG_OPTIONS="\
     --with-http_v2_module \
     --with-http_v3_module \
     --with-http_xslt_module=dynamic \
-    --with-ipv6 \
     --with-mail \
     --with-mail_ssl_module \
-    --with-md5-asm \
     --with-pcre-jit \
-    --with-sha1-asm \
     --with-stream \
     --with-stream_ssl_module \
     --with-threads \
@@ -55,19 +52,23 @@ ARG RESTY_CONFIG_OPTIONS_MORE="\
     --user=www-data \
     --group=www-data \
     --with-http_iconv_module \
+    --add-module=/tmp/nginx-ct-master \
+    --add-module=/tmp/nginx-dav-ext-module-master \
+    --add-module=/tmp/ngx_brotli-master \
+    --add-module=/tmp/ngx_cache_purge-master \
+    --add-module=/tmp/ngx_http_substitutions_filter_module-master \
     "
 ARG RESTY_LUAJIT_OPTIONS="--with-luajit-xcflags='-DLUAJIT_NUMMODE=2 -DLUAJIT_ENABLE_LUA52COMPAT'"
-ARG RESTY_PCRE_OPTIONS="--with-pcre-jit"
 
 ARG RESTY_ADD_PACKAGE_BUILDDEPS=""
 ARG RESTY_ADD_PACKAGE_RUNDEPS=""
 ARG RESTY_EVAL_PRE_CONFIGURE=""
-ARG RESTY_EVAL_POST_DOWNLOAD_PRE_CONFIGURE=""
 ARG RESTY_EVAL_POST_MAKE=""
 
 # These are not intended to be user-specified
 ARG _RESTY_CONFIG_DEPS="--with-pcre \
-    --with-cc-opt='-DNGX_LUA_ABORT_AT_PANIC -I/usr/local/openresty/pcre/include -I/usr/local/openresty/openssl/include' \
+    --with-openssl-opt='enable-ec_nistp_64_gcc_128 enable-aria' \
+    --with-cc-opt='-DNGX_LUA_ABORT_AT_PANIC -I/usr/local/openresty/pcre/include -I/usr/local/openresty/openssl/include march=native -msse4.2 -msha' \
     --with-ld-opt='-L/usr/local/openresty/pcre/lib -L/usr/local/openresty/openssl/lib -Wl,-rpath,/usr/local/openresty/pcre/lib:/usr/local/openresty/openssl/lib' \
     "
 
@@ -84,10 +85,7 @@ LABEL resty_config_deps="${_RESTY_CONFIG_DEPS}"
 LABEL resty_add_package_builddeps="${RESTY_ADD_PACKAGE_BUILDDEPS}"
 LABEL resty_add_package_rundeps="${RESTY_ADD_PACKAGE_RUNDEPS}"
 LABEL resty_eval_pre_configure="${RESTY_EVAL_PRE_CONFIGURE}"
-LABEL resty_eval_post_download_pre_configure="${RESTY_EVAL_POST_DOWNLOAD_PRE_CONFIGURE}"
 LABEL resty_eval_post_make="${RESTY_EVAL_POST_MAKE}"
-LABEL resty_luajit_options="${RESTY_LUAJIT_OPTIONS}"
-LABEL resty_pcre_options="${RESTY_PCRE_OPTIONS}"
 
 ARG CHANGE_SOURCE=false
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
@@ -125,7 +123,6 @@ RUN apk add --no-cache --virtual .build-deps \
     && cd /tmp \
     && if [ -n "${RESTY_EVAL_PRE_CONFIGURE}" ]; then eval $(echo ${RESTY_EVAL_PRE_CONFIGURE}); fi \
     && cd /tmp \
-    && echo curl -fSL "${RESTY_OPENSSL_URL_BASE}/openssl-${RESTY_OPENSSL_VERSION}.tar.gz" -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && curl -fSL "${RESTY_OPENSSL_URL_BASE}/openssl-${RESTY_OPENSSL_VERSION}.tar.gz" -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && tar xzf openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && cd openssl-${RESTY_OPENSSL_VERSION} \
@@ -159,13 +156,14 @@ RUN apk add --no-cache --virtual .build-deps \
     && tar xzf nginx-dav-ext-module.tar.gz \
     && curl -fSL https://github.com/google/ngx_brotli/archive/master.tar.gz -o ngx_brotli.tar.gz \
     && tar xzf ngx_brotli.tar.gz \
+    && curl -fSL https://github.com/google/brotli/archive/refs/tags/v1.1.0.tar.gz -o ngx_brotli_deps.tar.gz \
+    && tar xzf ngx_brotli_deps.tar.gz -C ngx_brotli-master/deps/brotli --strip-components=1  \
     && curl -fSL https://github.com/yaoweibin/ngx_http_substitutions_filter_module/archive/master.tar.gz -o ngx_http_substitutions_filter_module.tar.gz \
     && tar xzf ngx_http_substitutions_filter_module.tar.gz \
     && curl -fSL https://github.com/FRiCKLE/ngx_cache_purge/archive/master.tar.gz -o ngx_cache_purge.tar.gz \
     && tar xzf ngx_cache_purge.tar.gz \
     && cd /tmp/openresty-${RESTY_VERSION} \
-    && if [ -n "${RESTY_EVAL_POST_DOWNLOAD_PRE_CONFIGURE}" ]; then eval $(echo ${RESTY_EVAL_POST_DOWNLOAD_PRE_CONFIGURE}); fi \
-    && eval ./configure -j${RESTY_J} ${_RESTY_CONFIG_DEPS} ${RESTY_CONFIG_OPTIONS} ${RESTY_CONFIG_OPTIONS_MORE} ${RESTY_LUAJIT_OPTIONS} ${RESTY_PCRE_OPTIONS} \
+    && eval ./configure -j${RESTY_J} ${_RESTY_CONFIG_DEPS} ${RESTY_CONFIG_OPTIONS} ${RESTY_CONFIG_OPTIONS_MORE} ${RESTY_LUAJIT_OPTIONS} \
     && make -j${RESTY_J} \
     && make -j${RESTY_J} install \
     && cd /tmp \
