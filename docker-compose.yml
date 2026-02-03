@@ -2949,3 +2949,128 @@ services:
       restart: always
       networks:
         - backend
+
+  ### sub2api #################################################
+    sub2api:
+      build:
+        context: ./sub2api
+      restart: always
+      ulimits:
+        nofile:
+          soft: 100000
+          hard: 100000
+      ports:
+        - ${SUB2API_PORT}:8080
+      volumes:
+        # Local directory mapping for easy migration
+        - ./sub2api/data:/app/data
+        # Optional: Mount custom config.yaml (uncomment and create the file first)
+        # Copy config.example.yaml to config.yaml, modify it, then uncomment:
+        # - ./config.yaml:/app/data/config.yaml:ro
+      environment:
+        # =======================================================================
+        # Auto Setup (REQUIRED for Docker deployment)
+        # =======================================================================
+        - AUTO_SETUP=true
+
+        # =======================================================================
+        # Server Configuration
+        # =======================================================================
+        - SERVER_HOST=0.0.0.0
+        - SERVER_PORT=${SUB2API_PORT}
+        - SERVER_MODE=${SUB2API_SERVER_MODE:-release}
+        - RUN_MODE=${SUB2API_RUN_MODE:-standard}
+
+        # =======================================================================
+        # Database Configuration (PostgreSQL)
+        # =======================================================================
+        - DATABASE_HOST=postgres
+        - DATABASE_PORT=${POSTGRES_PORT}
+        - DATABASE_USER=${POSTGRES_USER}
+        - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+        - DATABASE_DBNAME=${POSTGRES_DB:-sub2api}
+        - DATABASE_SSLMODE=disable
+
+        # =======================================================================
+        # Redis Configuration
+        # =======================================================================
+        - REDIS_HOST=redis
+        - REDIS_PORT=${REDIS_PORT}
+        - REDIS_PASSWORD=${REDIS_PASSWORD}
+        - REDIS_DB=${REDIS_DB:-0}
+        - REDIS_ENABLE_TLS=${REDIS_ENABLE_TLS:-false}
+
+        # =======================================================================
+        # Admin Account (auto-created on first run)
+        # =======================================================================
+        - ADMIN_EMAIL=${SUB2API_ADMIN_EMAIL}
+        - ADMIN_PASSWORD=${SUB2API_ADMIN_PASSWORD}
+
+        # =======================================================================
+        # JWT Configuration
+        # =======================================================================
+        # IMPORTANT: Set a fixed JWT_SECRET to prevent login sessions from being
+        # invalidated after container restarts. If left empty, a random secret
+        # will be generated on each startup.
+        # Generate a secure secret: openssl rand -hex 32
+        - JWT_SECRET=${SUB2API_JWT_SECRET:-}
+        - JWT_EXPIRE_HOUR=${JWT_EXPIRE_HOUR:-24}
+
+        # =======================================================================
+        # TOTP (2FA) Configuration
+        # =======================================================================
+        # IMPORTANT: Set a fixed encryption key for TOTP secrets. If left empty,
+        # a random key will be generated on each startup, causing all existing
+        # TOTP configurations to become invalid (users won't be able to login
+        # with 2FA).
+        # Generate a secure key: openssl rand -hex 32
+        - TOTP_ENCRYPTION_KEY=${SUB2API_TOTP_ENCRYPTION_KEY:-}
+
+        # =======================================================================
+        # Timezone Configuration
+        # This affects ALL time operations in the application:
+        # - Database timestamps
+        # - Usage statistics "today" boundary
+        # - Subscription expiry times
+        # - Log timestamps
+        # Common values: Asia/Shanghai, America/New_York, Europe/London, UTC
+        # =======================================================================
+        - TZ=${TZ:-Asia/Shanghai}
+
+        # =======================================================================
+        # Gemini OAuth Configuration (for Gemini accounts)
+        # =======================================================================
+        - GEMINI_OAUTH_CLIENT_ID=${GEMINI_OAUTH_CLIENT_ID:-}
+        - GEMINI_OAUTH_CLIENT_SECRET=${GEMINI_OAUTH_CLIENT_SECRET:-}
+        - GEMINI_OAUTH_SCOPES=${GEMINI_OAUTH_SCOPES:-}
+        - GEMINI_QUOTA_POLICY=${GEMINI_QUOTA_POLICY:-}
+
+        # =======================================================================
+        # Security Configuration (URL Allowlist)
+        # =======================================================================
+        # Enable URL allowlist validation (false to skip allowlist checks)
+        - SECURITY_URL_ALLOWLIST_ENABLED=${SECURITY_URL_ALLOWLIST_ENABLED:-false}
+        # Allow insecure HTTP URLs when allowlist is disabled (default: false, requires https)
+        - SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP=${SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP:-false}
+        # Allow private IP addresses for upstream/pricing/CRS (for internal deployments)
+        - SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS=${SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS:-false}
+        # Upstream hosts whitelist (comma-separated, only used when enabled=true)
+        - SECURITY_URL_ALLOWLIST_UPSTREAM_HOSTS=${SECURITY_URL_ALLOWLIST_UPSTREAM_HOSTS:-}
+
+        # =======================================================================
+        # Update Configuration (在线更新配置)
+        # =======================================================================
+        # Proxy for accessing GitHub (online updates + pricing data)
+        # Examples: http://host:port, socks5://host:port
+        - UPDATE_PROXY_URL=${UPDATE_PROXY_URL:-}
+      depends_on:
+        - postgres
+        - redis
+      networks:
+        - backend
+      healthcheck:
+        test: [ "CMD", "curl", "-f", "http://localhost:${SUB2API_PORT}/health" ]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 30s
