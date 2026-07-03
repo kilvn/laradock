@@ -1,0 +1,30 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "title": {
+      "model": "opencode/deepseek-v4-flash-free"
+    }
+  },
+  "model": "opencode-go/deepseek-v4-pro",
+  "lsp": true,
+  "plugin": [
+    "oh-my-openagent@latest",
+    "@cortexkit/opencode-magic-context"
+  ],
+  "compaction": {
+    "auto": false,
+    "prune": false
+  },
+  "small_model": "opencode/deepseek-v4-flash-free",
+  "mcp": {
+    "codegraph": {
+      "type": "local",
+      "command": [
+        "codegraph",
+        "serve",
+        "--mcp"
+      ],
+      "enabled": true
+    }
+  }
+}

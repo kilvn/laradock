@@ -1,0 +1,120 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+  "disabled_hooks": [
+    "context-window-monitor",
+    "preemptive-compaction",
+    "anthropic-context-window-limit-recovery",
+    "compaction-context-injector"
+  ],
+  "agents": {
+    "atlas": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "explore": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "general": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max",
+      "temperature": 0.2,
+      "system_prompt_template": "AGENTS.md",
+      "permissions": [
+        "fs:read",
+        "fs:write",
+        "terminal:execute"
+      ]
+    },
+    "hephaestus": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "medium"
+    },
+    "librarian": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "metis": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "momus": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "multimodal-looker": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "oracle": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "prometheus": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "scout": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "sisyphus": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "medium",
+      "temperature": 0.2,
+      "system_prompt_template": "AGENTS.md",
+      "permissions": [
+        "fs:read",
+        "fs:write",
+        "terminal:execute"
+      ]
+    },
+    "sisyphus-junior": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    }
+  },
+  "categories": {
+    "artistry": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "deep": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "medium"
+    },
+    "quick": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "ultrabrain": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "unspecified-high": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "medium"
+    },
+    "unspecified-low": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "visual-engineering": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    },
+    "writing": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "max"
+    }
+  },
+  "default_mode": {
+    "ultrawork": true
+  },
+  "team_mode": {
+    "enabled": true,
+    "max_members": 4,
+    "max_parallel_members": 2,
+    "tmux_visualization": true
+  }
+}

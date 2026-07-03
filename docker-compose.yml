@@ -2952,7 +2952,7 @@ services:
       networks:
         - backend
 
-  ### sub2api #################################################
+### sub2api ###################################################
     sub2api:
       build:
         context: ./sub2api
@@ -3076,3 +3076,28 @@ services:
         timeout: 10s
         retries: 3
         start_period: 30s
+
+### opencode #################################################
+    opencode:
+      build:
+        context: ./opencode
+      environment:
+        - TZ=Asia/Shanghai
+        - OPENCODE_SERVER_USERNAME=${OPENCODE_SERVER_USERNAME}
+        - OPENCODE_SERVER_PASSWORD=${OPENCODE_SERVER_PASSWORD}
+        - GIT_AUTHOR_NAME=${OPENCODE_GIT_AUTHOR_NAME}
+        - GIT_AUTHOR_EMAIL=${OPENCODE_GIT_AUTHOR_EMAIL}
+        - GIT_COMMITTER_NAME=${OPENCODE_GIT_AUTHOR_NAME}
+        - GIT_COMMITTER_EMAIL=${OPENCODE_GIT_AUTHOR_EMAIL}
+      volumes:
+        - ${APP_CODE_PATH_HOST}:/workspace
+        - ./opencode/config:/root/.config/opencode
+        - ./opencode/data:/root/.local/share/opencode
+      ports:
+        - ${OPENCODE_PORT}:4096
+      tty: true
+      stdin_open: true
+      pull_policy: always
+      restart: always
+      networks:
+        - backend
