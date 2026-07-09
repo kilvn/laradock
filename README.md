@@ -14,6 +14,10 @@
 <p align="center"><b>Full PHP development environment based on Docker.</b></p>
 
 <p align="center">
+  🌐 <b>Languages:</b> <b>English</b> · <a href="./README-zh.md">简体中文</a> · <a href="./README-ar.md">العربية</a> · <a href="./README-es.md">Español</a>
+</p>
+
+<p align="center">
     <a href="https://zalt.me"><img src="http://forthebadge.com/images/badges/built-by-developers.svg" alt="forthebadge" width="180"></a>
 </p>
 
@@ -82,6 +86,46 @@ Laradock provides the PHP runtime, web server, databases, and background service
 - **Cross-platform:** the same environment on Linux, macOS, and Windows.
 - **Modular:** run only the containers you need, in any combination.
 - **Beginner-friendly:** clone, copy the env file, and run `docker compose up`.
+
+### Supported Services
+
+Laradock runs each service in its own container, which you turn on or off as needed. To start one, run `docker-compose up -d {container-name}` (the container name matches its folder name, e.g. `php-fpm`).
+
+<!-- SYNC: keep this table in sync with the "Supported Services" table in /DOCUMENTATION/docs/Intro.md -->
+| Category                  | Services (Containers)                                                                 |
+|---------------------------|--------------------------------------------------------------------------|
+| (**Laradock Workspace**)    | PHP CLI, Composer, Git, Vim, xDebug, Linuxbrew, Node, V8JS, Gulp, SQLite, Laravel Envoy, Deployer, Yarn, SOAP, Drush, Wordpress CLI, dnsutils, Terraform, ImageMagick, Drupal Console, Protoc, JDK, Docker Client |
+| **Web Servers**           | NGINX, Apache2, Caddy, OpenResty, Tomcat, FrankenPHP                                |
+| **Load Balancers**        | HAProxy, Traefik                                                         |
+| **PHP Compilers**         | PHP FPM, HHVM, RoadRunner                                                |
+| **Database Management Systems** | MySQL, PostgreSQL (PostGIS), pgvector, MariaDB, Percona, MSSQL, MongoDB, Neo4j, CouchDB, RethinkDB, Cassandra, ClickHouse, Tarantool |
+| **Database Management Tools** | PhpMyAdmin, Adminer, PgAdmin, MongoDB Web UI, Tarantool Admin, pgbackups (PostgreSQL) |
+| **Cache Engines**         | Redis, Redis Web UI, Redis Cluster, Valkey, Dragonfly, Memcached, Aerospike, Varnish, SSDB        |
+| **Message Brokers**       | RabbitMQ, RabbitMQ Admin Console, Beanstalkd, Beanstalkd Admin Console, Eclipse Mosquitto, Gearman, NATS, Apache Kafka, Kafka Manager |
+| **Log Management**        | GrayLog, Kibana, LogStash                                                |
+| **Search Engines**        | ElasticSearch, OpenSearch, Apache Solr, Manticore Search, Typesense, Dejavu          |
+| **Vector Databases**      | pgvector, Qdrant, Weaviate, Chroma                                       |
+| **Graph / Multi-model Databases** | Neo4j, ArangoDB, SurrealDB                                       |
+| **Time-series Databases** | InfluxDB                                                                 |
+| **AI / LLM**              | Ollama, LocalAI, LiteLLM                                                 |
+| **Agentic / Automation**  | n8n, Flowise                                                             |
+| **PHP Extensions**        | Swoole, Blackfire, Phalcon, PHP Worker, Laravel Horizon                  |
+| **Mail Servers**          | Mailu, MailCatcher, Mailhog, MailDev, Mailpit                                     |
+| **Real-time Communication** | Laravel Echo, Laravel Reverb, Mercure, Soketi                                        |
+| **Monitoring**            | Grafana, NetData, Prometheus                                            |
+| **Coordination Services** | Apache ZooKeeper                                                         |
+| **Container Management**  | Portainer, Docker Registry, Docker Web UI                                |
+| **CI/CD Tools**           | Jenkins, SonarQube, Gitlab, OneDev                                       |
+| **Cloud Tools**           | AWS EB CLI, Amazon Simple Queue Service                                  |
+| **Image Processing**      | Thumbor                                                                  |
+| **Interactive Computing** | IPython, Jupyter Hub                                                     |
+| **Security Tools**        | Certbot                                                                  |
+| **Object Storage**        | Minio                                                                    |
+| **Testing**               | Selenium                                                                 |
+| **IDEs**                  | Codiad, ICE Coder, Theia, Web IDE                                                |
+| **API Documentation**     | Swagger UI, Swagger Editor                                              |
+
+See the [full service list and usage docs](https://laradock.io/docs/Intro#supported-services).
 
 ### The Workspace: Your All-in-One Dev Shell
 
@@ -302,10 +346,6 @@ Sponsoring is an act of giving in a different fashion. 🌱
 
 ![Bronze Sponsors](https://opencollective.com/laradock/tiers/bronze-sponsors.svg?avatarHeight=65&width=800&format=svg&button=false&background=%231B1B1D&isActive=false)
 
-
-## Translations
-
-- [中文文档 (Chinese)](./README-zh.md)
 
 ## License
 

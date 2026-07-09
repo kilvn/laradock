@@ -1222,6 +1222,269 @@ Varnish sits behind NGINX as a caching reverse proxy. NGINX listens on 80/443, f
 **Master key** — `masterkey`.
 
 
+<a name="Use-Typesense"></a>
+### Typesense
+
+[Typesense](https://typesense.org) is a fast, typo-tolerant open-source search engine and a drop-in [Laravel Scout](https://laravel.com/docs/scout) driver.
+
+1. Configure it in your `.env` (defaults shown):
+   ```dotenv
+   TYPESENSE_VERSION=30.2
+   TYPESENSE_HOST_PORT=8108
+   TYPESENSE_API_KEY=typesense
+   ```
+2. Start the container:
+   ```bash
+   docker-compose up -d typesense
+   ```
+3. The API is available at [http://localhost:8108](http://localhost:8108); health check: `curl http://localhost:8108/health`.
+
+**API key** — `typesense` (change `TYPESENSE_API_KEY` for anything beyond local dev).
+<a name="Use-pgvector"></a>
+### pgvector (PostgreSQL + vectors)
+
+[pgvector](https://github.com/pgvector/pgvector) is the PostgreSQL extension for vector similarity search, commonly used for AI/RAG features. This service runs a Postgres image with pgvector preinstalled, on its own port and data folder so it can run alongside the regular `postgres` service.
+
+1. Configure it in your `.env` (defaults shown):
+   ```dotenv
+   PGVECTOR_VERSION=pg17
+   PGVECTOR_PORT=5433
+   PGVECTOR_DB=default
+   PGVECTOR_USER=default
+   PGVECTOR_PASSWORD=secret
+   ```
+2. Start the container:
+   ```bash
+   docker-compose up -d pgvector
+   ```
+3. Connect on host port `5433`. The `vector` extension is enabled automatically in `PGVECTOR_DB` on first init (see `pgvector/docker-entrypoint-initdb.d/init.sql`).
+<a name="Use-Laravel-Reverb"></a>
+### Laravel Reverb
+
+[Laravel Reverb](https://reverb.laravel.com) is Laravel's first-party WebSocket server (a modern replacement for the legacy `laravel-echo-server` / Soketi). This container runs `php artisan reverb:start` against your mounted application code.
+
+1. Install Reverb in your Laravel app (once): `php artisan install:broadcasting` and set `BROADCAST_CONNECTION=reverb` in your app `.env`.
+2. Point Reverb at `0.0.0.0` in your app `.env` so it is reachable from the host: `REVERB_HOST=0.0.0.0`, `REVERB_PORT=8080`.
+3. Start the container:
+   ```bash
+   docker-compose up -d laravel-reverb
+   ```
+4. The WebSocket server is available on host port `8080` (configurable via `LARAVEL_REVERB_PORT`).
+<a name="Use-FrankenPHP"></a>
+### FrankenPHP
+
+[FrankenPHP](https://frankenphp.dev) is a modern Caddy-based PHP application server and the recommended runtime for [Laravel Octane](https://laravel.com/docs/octane). It serves your app (mounted at `/app`, Laravel docroot `/app/public`) with automatic HTTPS, HTTP/3 and a worker mode.
+
+1. Configure it in your `.env` (defaults shown):
+   ```dotenv
+   FRANKENPHP_VERSION=1-php8
+   FRANKENPHP_HTTP_PORT=8000
+   FRANKENPHP_HTTPS_PORT=8443
+   ```
+2. Start the container:
+   ```bash
+   docker-compose up -d frankenphp
+   ```
+3. Your app is served on [https://localhost:8443](https://localhost:8443) (HTTP on `8000` auto-redirects to HTTPS). Add PHP extensions by editing `frankenphp/Dockerfile` (`install-php-extensions ...`). For Octane worker mode, follow the [Octane + FrankenPHP docs](https://laravel.com/docs/octane#frankenphp).
+<a name="Use-RoadRunner"></a>
+### RoadRunner
+
+[RoadRunner](https://roadrunner.dev) is a high-performance Go-based PHP application server and a [Laravel Octane](https://laravel.com/docs/octane) driver. This container ships the `rr` binary on top of a PHP-CLI image and serves your mounted app via its `.rr.yaml`.
+
+1. In your Laravel app install Octane with the RoadRunner driver: `composer require laravel/octane spiral/roadrunner-cli` then `php artisan octane:install --server=roadrunner` (generates `.rr.yaml`). Set the HTTP address to `0.0.0.0:8080` in `.rr.yaml`.
+2. Configure it in your `.env` (defaults shown):
+   ```dotenv
+   ROADRUNNER_VERSION=2025.1.15
+   ROADRUNNER_HTTP_PORT=8090
+   ```
+3. Start the container:
+   ```bash
+   docker-compose up -d roadrunner
+   ```
+4. Your app is served on host port `8090` (configurable via `ROADRUNNER_HTTP_PORT`).
+
+
+<a name="Use-Ollama"></a>
+### Ollama
+
+[Ollama](https://ollama.com) runs open LLMs locally and exposes an OpenAI-compatible HTTP API, giving PHP apps local inference with no external calls or per-token cost. Point Prism, Neuron AI, LLPhant, or openai-php at it, and pair it with `pgvector` for fully local RAG.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d ollama
+   ```
+2. API on `http://localhost:11434` from the host, `http://ollama:11434` from other containers (OpenAI-compatible base `http://ollama:11434/v1`). Pull a model: `docker-compose exec ollama ollama pull llama3.2`.
+
+
+<a name="Use-LocalAI"></a>
+### LocalAI
+
+[LocalAI](https://localai.io) is a free, self-hosted drop-in replacement for the OpenAI REST API (LLMs, embeddings, image gen) on your own hardware.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d localai
+   ```
+2. API on `http://localhost:8088` (readiness `/readyz`, models `/v1/models`). Models persist in the `localai` volume at `/models`; from your app use `http://localai:8080/v1`.
+
+
+<a name="Use-LiteLLM"></a>
+### LiteLLM
+
+[LiteLLM](https://litellm.ai) is an LLM proxy/gateway exposing one OpenAI-compatible endpoint that routes to any provider, the backbone of agentic apps needing a unified API and key management.
+
+1. Edit `litellm/config.yaml` to add your models/providers (a commented Ollama example is included).
+2. Start the container:
+   ```bash
+   docker-compose up -d litellm
+   ```
+3. Proxy on `http://localhost:4000` (health `/health/liveliness`). Auth with `LITELLM_MASTER_KEY` (default `sk-laradock`).
+
+
+<a name="Use-n8n"></a>
+### n8n
+
+[n8n](https://n8n.io) is a workflow-automation platform with first-class AI/agent nodes. Build agentic flows visually and call your app's webhooks.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d n8n
+   ```
+2. Editor at `http://localhost:5678` (health `/healthz`). Workflows persist in the `n8n` volume.
+
+
+<a name="Use-Flowise"></a>
+### Flowise
+
+[Flowise](https://flowiseai.com) is a visual, low-code builder for LLM apps and AI agents. Prototype agent/RAG flows and call them from Laravel over HTTP.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d flowise
+   ```
+2. Builder at `http://localhost:3020` (health `/api/v1/ping` returns `pong`).
+
+
+<a name="Use-Qdrant"></a>
+### Qdrant
+
+[Qdrant](https://qdrant.tech) is a high-performance vector database for storing and querying embeddings (semantic search, RAG) over a REST API.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d qdrant
+   ```
+2. REST on `http://localhost:6333` (health `/healthz`, dashboard `/dashboard`), gRPC on `6334`.
+
+
+<a name="Use-Weaviate"></a>
+### Weaviate
+
+[Weaviate](https://weaviate.io) is an open-source vector database with REST and GraphQL APIs, used for embeddings and RAG from PHP over HTTP.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d weaviate
+   ```
+2. Reachable at `http://localhost:8085` (REST under `/v1`, readiness `/v1/.well-known/ready`). Anonymous access is on by default.
+
+
+<a name="Use-Chroma"></a>
+### Chroma
+
+[Chroma](https://www.trychroma.com) is a lightweight open-source vector database with a simple HTTP API, handy for semantic-search / RAG prototypes.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d chroma
+   ```
+2. API on `http://localhost:8001` (heartbeat `/api/v2/heartbeat`). Data persists in the `chroma` volume at `/data`.
+
+
+<a name="Use-ArangoDB"></a>
+### ArangoDB
+
+[ArangoDB](https://arangodb.com) is a multi-model database (document + graph + key/value) with the AQL query language, a graph option beyond Neo4j.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d arangodb
+   ```
+2. Web UI and API on `http://localhost:8529` (version `/_api/version`). Root password set by `ARANGODB_ROOT_PASSWORD` (default `secret`).
+
+
+<a name="Use-SurrealDB"></a>
+### SurrealDB
+
+[SurrealDB](https://surrealdb.com) is a multi-model database (document, graph, relational) with a SQL-like language and REST/WebSocket API.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d surrealdb
+   ```
+2. API on `http://localhost:8010` (health `/health`). Credentials `SURREALDB_USER` / `SURREALDB_PASSWORD` (default `root` / `secret`); data persists in the `surrealdb` volume.
+
+
+<a name="Use-InfluxDB"></a>
+### InfluxDB
+
+[InfluxDB](https://www.influxdata.com) is an open-source time-series database for high-volume metrics, events, and IoT/analytics data, chart it with Grafana.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d influxdb
+   ```
+2. UI and API on `http://localhost:8086` (health `/health`). First-run credentials from `.env` (`INFLUXDB_INIT_*`): user `laradock`, org `laradock`, bucket `default`.
+
+
+<a name="Use-Prometheus"></a>
+### Prometheus
+
+[Prometheus](https://prometheus.io) is the standard metrics and monitoring system with a time-series DB and PromQL, the usual data source for Laradock's Grafana.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d prometheus
+   ```
+2. Web UI on `http://localhost:9091` (health `/-/healthy`). Edit `prometheus/prometheus.yml` to add scrape targets, then restart.
+
+
+<a name="Use-Valkey"></a>
+### Valkey
+
+[Valkey](https://valkey.io) is the community fork of Redis (created after the 2024 licence change) and is fully Redis-compatible. Point any Redis client at it.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d valkey
+   ```
+2. Reachable on `${VALKEY_PORT}` (default `6380`) from the host, `valkey:6379` from other containers.
+
+
+<a name="Use-Dragonfly"></a>
+### Dragonfly
+
+[Dragonfly](https://www.dragonflydb.io) is a modern, high-throughput in-memory store that is wire-compatible with Redis and Memcached.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d dragonfly
+   ```
+2. Reachable on `${DRAGONFLY_PORT}` (default `6381`) from the host, `dragonfly:6379` from other containers. Uses any Redis client.
+
+
+<a name="Use-OpenSearch"></a>
+### OpenSearch
+
+[OpenSearch](https://opensearch.org) is the Apache-2.0 open-source fork of Elasticsearch (search + analytics). This dev setup runs a single node with the security plugin disabled.
+
+1. Start the container:
+   ```bash
+   docker-compose up -d opensearch
+   ```
+2. REST API on `http://localhost:9202` (`OPENSEARCH_HOST_PORT`); `curl http://localhost:9202` returns the version. From other containers use `http://opensearch:9200`.
+
+
 <a name="Use-Beanstalkd"></a>
 ### Beanstalkd
 
