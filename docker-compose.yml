@@ -2369,6 +2369,7 @@ services:
       tty: true
       environment:
         - XRAY_VMESS_AEAD_FORCED=false
+        - TZ=Asia/Shanghai
       restart: always
       volumes:
         - ./3x-ui/db/:/etc/x-ui/
@@ -2930,4 +2931,35 @@ services:
       pull_policy: always
       restart: always
       networks:
+        - backend
+
+### WorkBuddy #################################################
+    workbuddy:
+      restart: always
+      build:
+        context: ./workbuddy
+      depends_on:
+        - mariadb
+      environment:
+        - TZ=${WORKSPACE_TIMEZONE}
+        - DB_HOST=mariadb
+        - DB_PORT=3306
+        - DB_NAME=${WORKBUDDY_DB_NAME}
+        - DB_USER=${WORKBUDDY_DB_USER}
+        - DB_PASSWORD=${WORKBUDDY_DB_PASSWORD}
+        - DB_DRIVER=mysql
+        - JWT_SECRET=${WORKBUDDY_JWT_SECRET}
+        - CLAW_TOKEN=${WORKBUDDY_CLAW_TOKEN}
+        - LOG_LEVEL=${WORKBUDDY_LOG_LEVEL}
+        - API_BASE_URL=${WORKBUDDY_API_BASE_URL}
+        - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      volumes:
+        - ./workbuddy/config:/app/config
+        - ./workbuddy/workspace:/app/workspace
+        - ./workbuddy/downloads:/app/downloads
+        - ./workbuddy/data/workbuddy.db:/root/.workbuddy/workbuddy.db
+      ports:
+        - "${WORKBUDDY_PORT}:8080"
+      networks:
+        - frontend
         - backend
