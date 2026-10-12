@@ -50,6 +50,8 @@ volumes:
     driver: ${VOLUMES_DRIVER}
   docker-in-docker:
     driver: ${VOLUMES_DRIVER}
+  paseo_home:
+    driver: ${VOLUMES_DRIVER}
 
 services:
 
@@ -2962,4 +2964,27 @@ services:
         - "${WORKBUDDY_PORT}:8080"
       networks:
         - frontend
+        - backend
+
+### Paseo #####################################################
+    paseo:
+      build:
+        context: ./paseo
+        args:
+          BUILD_PROXY: ${PASEO_BUILD_PROXY:-}
+          NPM_REGISTRY: ${PASEO_NPM_REGISTRY:-}
+      restart: always
+      environment:
+        - TZ=${TZ:-Asia/Shanghai}
+        - PASEO_PASSWORD=${PASEO_PASSWORD}
+        - PASEO_HOSTNAMES=${PASEO_HOSTNAMES:-}
+        - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+        - PASEO_CHOWN_WORKSPACE=${PASEO_CHOWN_WORKSPACE:-1}
+      volumes:
+        - ${PASEO_WORKSPACE}:/workspace
+        # daemon 状态 + agent 凭据；named volume 保证 POSIX 权限（Windows bind 不支持 chmod）
+        - paseo_home:/home/paseo
+      ports:
+        - ${PASEO_PORT}:6767
+      networks:
         - backend
