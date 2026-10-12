@@ -48,4 +48,4 @@ COPY entrypoint-wrapper.sh /usr/local/bin/paseo-entrypoint-wrapper.sh
 RUN chmod +x /usr/local/bin/paseo-entrypoint-wrapper.sh
 
 ENTRYPOINT ["/usr/local/bin/paseo-entrypoint-wrapper.sh"]
- WORKDIR /workspace
+WORKDIR /workspace
