@@ -2982,8 +2982,7 @@ services:
         - PASEO_CHOWN_WORKSPACE=${PASEO_CHOWN_WORKSPACE:-1}
       volumes:
         - ./paseo/workspace:/workspace
-        # daemon 状态 + agent 凭据；named volume 保证 POSIX 权限（Windows bind 不支持 chmod）
-        - paseo_home:/home/paseo
+        - ./paseo/paseo_home:/home/paseo
       ports:
         - ${PASEO_PORT}:6767
       networks:
