@@ -1,0 +1,15 @@
+# omp 客户端片段
+# 合并进 ~/.omp/agent/models.yml 的 providers 下，保留已有的 echobird 等条目。
+# 占位符同 OpenCode 片段。
+
+gw:
+  api: openai-completions
+  apiKey: <TOKEN>
+  baseUrl: http://<GATEWAY_HOST>:3101/v1
+  models:
+    - id: fast
+      name: Fast
+    - id: code
+      name: Code
+    - id: think
+      name: Think

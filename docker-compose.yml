@@ -2987,3 +2987,25 @@ services:
         - ${PASEO_PORT}:6767
       networks:
         - backend
+
+    ### New API ###################################################
+    new-api:
+      image: calciumion/new-api:${NEW_API_VERSION}
+      restart: always
+      volumes:
+        - ${DATA_PATH_HOST}/new-api:/data
+      ports:
+        - "${NEW_API_PORT}:3000"
+      environment:
+        TZ: ${WORKSPACE_TIMEZONE}
+        # New API 只支持整串 SQL_DSN，没有拆分的 host/user/password 变量。
+        # 端口写容器内固定端口：MARIADB_PORT / REDIS_PORT 是宿主机映射端口，
+        # 改它们不会改变容器网络内的监听端口，用在这里会连不上。
+        SQL_DSN: "${NEW_API_DB_USER}:${NEW_API_DB_PASSWORD}@tcp(${DB_HOST}:3306)/${NEW_API_DB_NAME}?charset=utf8mb4&parseTime=True&loc=Local"
+        REDIS_CONN_STRING: "redis://${REDIS_HOST}:6379/${NEW_API_REDIS_DB}"
+        SESSION_SECRET: "${NEW_API_SESSION_SECRET}"
+        SESSION_COOKIE_SECURE: "${NEW_API_SESSION_COOKIE_SECURE}"
+        SESSION_COOKIE_TRUSTED_URL: "${NEW_API_SESSION_COOKIE_TRUSTED_URL:-}"
+        TRUSTED_PROXIES: "127.0.0.1,172.16.0.0/12"
+      networks:
+        - backend

@@ -1,0 +1,15 @@
+{
+  "gw": {
+    "name": "AI Gateway",
+    "package": "@opencode/ai/providers/openai-compatible",
+    "settings": {
+      "baseURL": "http://<GATEWAY_HOST>:3101/v1",
+      "apiKey": "<TOKEN>"
+    },
+    "models": {
+      "fast": {},
+      "code": {},
+      "think": {}
+    }
+  }
+}
