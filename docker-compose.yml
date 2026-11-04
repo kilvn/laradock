@@ -2988,7 +2988,7 @@ services:
       networks:
         - backend
 
-    ### New API ###################################################
+### New API ###################################################
     new-api:
       image: calciumion/new-api:${NEW_API_VERSION}
       restart: always
@@ -3010,7 +3010,7 @@ services:
       networks:
         - backend
 
-    ### magpie ##################################################
+### magpie ####################################################
     magpie:
       image: ghcr.io/yetone/magpie:${MAGPIE_VERSION}
       restart: always
