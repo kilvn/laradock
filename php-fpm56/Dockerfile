@@ -27,10 +27,13 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ARG CHANGE_SOURCE=false
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
-    # Change application source from deb.debian.org to aliyun source
-    sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    sed -i 's/security-cdn.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list \
+    printf "%s\n" \
+      "deb [trusted=yes] http://mirrors.aliyun.com/debian-archive/debian/ stretch main contrib non-free" \
+      "deb [trusted=yes] http://mirrors.aliyun.com/debian-archive/debian-security/ stretch/updates main contrib non-free" \
+      > /etc/apt/sources.list && \
+    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until && \
+    echo 'APT::Get::AllowUnauthenticated "true";' > /etc/apt/apt.conf.d/99allow-unauth && \
+    echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries \
 ;fi
 
 RUN if [ "$LARADOCK_PHP_VERSION" = "7.1" ] || [ ${LARADOCK_PHP_VERSION} = "7.2" ]; then \
@@ -44,7 +47,7 @@ fi
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
     apt-get update -yqq && \
-    pecl channel-update pecl.php.net && \
+    (pecl channel-update pecl.php.net || true) && \
     apt-get install -yqq \
       apt-utils \
       gnupg2 \
@@ -309,11 +312,18 @@ RUN if [ ${INSTALL_XDEBUG} = false -a ${INSTALL_BLACKFIRE} = true ]; then \
 ###########################################################################
 
 ARG INSTALL_PHPREDIS=false
+COPY ./phpredis-4.3.0.tar.gz /tmp/phpredis-4.3.0.tar.gz
+
 
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
-      pecl install -o -f redis-4.3.0; \
+      if [ -f /tmp/phpredis-4.3.0.tar.gz ]; then \
+        cd /tmp && tar -xzf phpredis-4.3.0.tar.gz && cd phpredis-4.3.0 && \
+        phpize && ./configure && make -j$(nproc) && make install && rm -rf /tmp/phpredis*; \
+      else \
+        pecl install -o -f redis-4.3.0; \
+      fi; \
     elif [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && { [ $(php -r "echo PHP_MINOR_VERSION;") = "0" ] || [ $(php -r "echo PHP_MINOR_VERSION;") = "1" ] ;}; then \
       pecl install -o -f redis-5.3.7; \
     elif [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && { [ $(php -r "echo PHP_MINOR_VERSION;") = "2" ] || [ $(php -r "echo PHP_MINOR_VERSION;") = "3" ] ;}; then \
@@ -840,6 +850,8 @@ ARG INSTALL_IMAGEMAGICK=false
 ARG IMAGEMAGICK_VERSION=latest
 ENV IMAGEMAGICK_VERSION ${IMAGEMAGICK_VERSION}
 
+COPY ./imagick-3.4.4.tar.gz /tmp/imagick-3.4.4.tar.gz
+
 RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
     apt-get update && \
     apt-get install -yqq libmagickwand-dev imagemagick && \
@@ -857,7 +869,12 @@ RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
       make install && \
       rm -r /tmp/imagick; \
     else \
-      pecl install imagick; \
+      if [ -f /tmp/imagick-3.4.4.tar.gz ]; then \
+        cd /tmp && tar -xzf imagick-3.4.4.tar.gz && cd imagick-3.4.4 && \
+        phpize && ./configure && make -j$(nproc) && make install && rm -rf /tmp/imagick*; \
+      else \
+        pecl install imagick; \
+      fi; \
     fi && \
     docker-php-ext-enable imagick; \
     php -m | grep -q 'imagick' \
@@ -1381,7 +1398,8 @@ USER root
 ARG INSTALL_DNSUTILS=false
 
 RUN if [ ${INSTALL_DNSUTILS} = true ]; then \
-    apt-get update && apt-get install -y dnsutils \
+    sed -i 's/contrib non-free//g' /etc/apt/sources.list && \
+    apt-get update && apt-get install -yqq --allow-unauthenticated dnsutils \
 ;fi
 
 ###########################################################################

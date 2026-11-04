@@ -27,10 +27,12 @@ ENV DEBIAN_FRONTEND noninteractive
 
 ARG CHANGE_SOURCE=false
 RUN if [ ${CHANGE_SOURCE} = true ]; then \
-    # Change application source from deb.debian.org to aliyun source
-    sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list && \
-    sed -i 's/security-cdn.debian.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apt/sources.list \
+    if [ -f /etc/apt/sources.list.d/debian.sources ]; then \
+      sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list.d/debian.sources; \
+    elif [ -f /etc/apt/sources.list ]; then \
+      sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list; \
+    fi && \
+    echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries \
 ;fi
 
 RUN if [ "$LARADOCK_PHP_VERSION" = "7.1" ] || [ ${LARADOCK_PHP_VERSION} = "7.2" ]; then \
@@ -44,7 +46,7 @@ fi
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
     apt-get update -yqq && \
-    pecl channel-update pecl.php.net && \
+    (pecl channel-update pecl.php.net || true) && \
     apt-get install -yqq \
       apt-utils \
       gnupg2 \
@@ -310,6 +312,8 @@ RUN if [ ${INSTALL_XDEBUG} = false -a ${INSTALL_BLACKFIRE} = true ]; then \
 
 ARG INSTALL_PHPREDIS=false
 
+COPY ./phpredis-6.1.0.tar.gz /tmp/phpredis-6.1.0.tar.gz
+
 RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     # Install Php Redis Extension
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
@@ -319,7 +323,12 @@ RUN if [ ${INSTALL_PHPREDIS} = true ]; then \
     elif [ $(php -r "echo PHP_MAJOR_VERSION;") = "7" ] && { [ $(php -r "echo PHP_MINOR_VERSION;") = "2" ] || [ $(php -r "echo PHP_MINOR_VERSION;") = "3" ] ;}; then \
       pecl install -o -f redis-6.0.2; \
     else \
-      pecl install -o -f redis; \
+      if [ -f /tmp/phpredis-6.1.0.tar.gz ]; then \
+        cd /tmp && tar -xzf phpredis-6.1.0.tar.gz && cd phpredis-6.1.0 && \
+        phpize && ./configure && make -j$(nproc) && make install && rm -rf /tmp/phpredis*; \
+      else \
+        pecl install -o -f redis; \
+      fi; \
     fi \
     && rm -rf /tmp/pear \
     && docker-php-ext-enable redis \
@@ -843,17 +852,20 @@ ARG INSTALL_IMAGEMAGICK=false
 ARG IMAGEMAGICK_VERSION=latest
 ENV IMAGEMAGICK_VERSION ${IMAGEMAGICK_VERSION}
 
+COPY ./imagick-master.tar.gz /tmp/imagick-master.tar.gz
+
 RUN if [ ${INSTALL_IMAGEMAGICK} = true ]; then \
     apt-get update && \
     apt-get install -yqq libmagickwand-dev imagemagick && \
     if [ $(php -r "echo PHP_MAJOR_VERSION;") = "8" ]; then \
       cd /tmp && \
-      if [ ${IMAGEMAGICK_VERSION} = "latest" ]; then \
-        git clone https://github.com/Imagick/imagick; \
+      if [ -f /tmp/imagick-master.tar.gz ]; then \
+        mkdir -p /tmp/imagick && tar -xzf /tmp/imagick-master.tar.gz -C /tmp/imagick --strip-components=1 && cd /tmp/imagick; \
+      elif [ ${IMAGEMAGICK_VERSION} = "latest" ]; then \
+        git clone https://github.com/Imagick/imagick /tmp/imagick && cd /tmp/imagick; \
       else \
-        git clone --branch ${IMAGEMAGICK_VERSION} https://github.com/Imagick/imagick; \
+        git clone --branch ${IMAGEMAGICK_VERSION} https://github.com/Imagick/imagick /tmp/imagick && cd /tmp/imagick; \
       fi && \
-      cd imagick && \
       phpize && \
       ./configure && \
       make && \

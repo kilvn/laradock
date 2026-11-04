@@ -224,6 +224,33 @@ Go 订阅**按模型分额度**，所以「主模型 + 备用模型」是成立�
 两个渠道共用同一把 key、同一个订阅。订阅整体失效（欠费、封号）时两个都挂。
 真要冗余必须接第二家厂商（DeepSeek 官方 / 智谱 / Kimi 等），步骤同上，只换 key 和 base URL。
 
+## 选型对比（2026-11-03 调研）
+
+当时的目标是「集中管理多个 token，并在某个 token 不可用时自动切换」。三个候选的能力边界：
+
+| 维度 | New API（当前采用） | sub2api | Cardinal |
+|---|---|---|---|
+| 定位 | 多渠道 API 网关 | 订阅账号池分发 | headless 多供应商路由 |
+| 集中管理 key | 渠道多密钥（随机/轮询） | 账号表（OAuth + API Key） | providers + keys |
+| 故障切换 | 优先级 + 失败重试 | 组内切账号 | ordered + 每 key 冷却 |
+| 额度感知路由 | 否，只按优先级 | 部分 | 是，定时探测余额端点 |
+| 模型级主备 | 模型重定向（ds→glm） | 无此概念 | 路由别名 |
+| 跨分组/跨模型降级 | 支持 | **不支持**，见 issue #1294 / #2313 / #2458 | 支持 |
+| 协议转换 | OpenAI / Anthropic / Gemini | 同 | Chat / Responses / Messages / Gemini |
+| Web 控制台 | 有 | 有 | **无**，仅管理 API |
+| 数据库 | MariaDB（本机已有） | PostgreSQL 15+ | PostgreSQL |
+| 部署方式 | 官方镜像 | 镜像 / 二进制 | **仅源码编译** |
+| 成熟度 | 高 | 活跃，2k+ issues | 2026-10-17 创建，6 star，无 release |
+| 许可 | AGPL-3.0 | LGPL-3.0 | GPL-3.0 |
+
+### 结论
+
+- **当前场景（OpenCode Go 订阅 + 厂商 API key）用 New API 足够**，主备切换已实测通过。
+- **sub2api** 唯一不可替代的能力是 OAuth 订阅账号池（Claude Max / ChatGPT Plus），需要拼车共订阅时才引入；代价是新增 PostgreSQL，且跨分组不会自动降级。
+- **Cardinal** 的路由模型最贴近「按额度自动选」的诉求，但额度探测依赖上游提供余额查询接口；OpenCode Go 目前没有这类端点，接进来会退化成普通 failover。加上零 release、无 Dockerfile、项目仅两周，暂不作为主网关，保留观察。
+
+三者组合使用没有收益：任选其一作为唯一门面，其余最多作为它的上游渠道。
+
 ## 升级（跟随 latest）
 
 ```bash

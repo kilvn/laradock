@@ -626,10 +626,17 @@ RUN set -eux; \
 ###########################################################################
 
 ARG INSTALL_XLSWRITER=false
+COPY xlswriter-*.tgz* /tmp/
 RUN set -eux; \
     if [ ${INSTALL_XLSWRITER} = true ]; then \
       # Install Php xlswriter Extension
-      if [ $(php -r "echo PHP_MAJOR_VERSION;") != "5" ]; then \
+      if [ -f /tmp/xlswriter-1.5.7.tgz ]; then \
+        printf "\n" | pecl install /tmp/xlswriter-1.5.7.tgz && \
+        rm -rf /tmp/xlswriter-*.tgz && \
+        echo "extension=xlswriter.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/xlswriter.ini && \
+        ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/xlswriter.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-xlswriter.ini && \
+        php -m | grep -q 'xlswriter'; \
+      elif [ $(php -r "echo PHP_MAJOR_VERSION;") != "5" ]; then \
         echo '' | pecl -q install xlswriter && \
         echo "extension=xlswriter.so" >> /etc/php/${LARADOCK_PHP_VERSION}/mods-available/xlswriter.ini && \
         ln -s /etc/php/${LARADOCK_PHP_VERSION}/mods-available/xlswriter.ini /etc/php/${LARADOCK_PHP_VERSION}/cli/conf.d/20-xlswriter.ini && \
@@ -690,8 +697,12 @@ RUN if [ ${INSTALL_INOTIFY} = true ]; then \
 
 ARG INSTALL_AST=false
 
+COPY ast-*.tgz* /tmp/
 RUN if [ ${INSTALL_AST} = true ]; then \
-    if [ "$(php -r 'echo PHP_VERSION_ID;')" -le 70100 ]; then \
+    if [ -f /tmp/ast-1.1.2.tgz ]; then \
+        printf "\n" | pecl install /tmp/ast-1.1.2.tgz && \
+        rm -rf /tmp/ast-*.tgz; \
+    elif [ "$(php -r 'echo PHP_VERSION_ID;')" -le 70100 ]; then \
         printf "\n" | pecl -q install ast-1.0.16; \
     else \
         printf "\n" | pecl -q install ast; \
