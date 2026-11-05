@@ -58,11 +58,15 @@ git fetch origin local && git checkout local && git pull
 ```ini
 ### magpie ###
 MAGPIE_VERSION=latest
-MAGPIE_BIND=0.0.0.0            # 反代走宿主网关 172.19.0.1:3430，必须绑 0.0.0.0
+# 端口绑定地址（宿主机侧）：
+#   172.19.0.1  仅 Docker 内网 + 宿主机，nginx 反代走得到，公网碰不到（推荐）
+#   127.0.0.1   仅宿主机回环，nginx 在容器里到不了，反代会失败
+#   0.0.0.0     所有网卡，公网可直连 IP:3425/3430，绕过 Cloudflare 的限速与 WAF，别用
+MAGPIE_BIND=172.19.0.1
 MAGPIE_PORT=3425
 MAGPIE_WEB_PORT=3430
 MAGPIE_WEB_KEY=<openssl rand -hex 16>
-MAGPIE_PUBLIC_URL=https://gw.<域名>
+MAGPIE_PUBLIC_URL=https://ai.<域名>
 ```
 
 启动：
@@ -94,13 +98,21 @@ sudo chmod 777 /root/.laradock/data/magpie              # 省事，但入口目�
 
 ### 网络：反代为什么写 172.19.0.1
 
-laradock 的 `openresty` 只加入 `frontend` 网络，`magpie` 在 `backend` 网络，容器名互相解析不到。所以 vhost 里写宿主网关 IP：
+宿主机在 laradock 网桥上有一个固定地址 `172.19.0.1`。magpie 端口绑到这个地址后：
 
 ```nginx
 proxy_pass http://172.19.0.1:3430;
 ```
 
-想让配置更干净，可以把 openresty 也加进 backend 网络，然后改成 `http://magpie:3430`。
+- nginx（容器内）走 docker 网桥能到 ✅
+- 公网打不到，`http://<服务器IP>:3430` 直接连不上 ✅
+- 不依赖容器名解析，magpie 容器不在时 openresty 重启也不会失败 ✅
+
+**不要绑 `127.0.0.1`**：那是容器自己的回环，nginx 在另一个容器里，会得到 connection refused。
+
+**也不要绑 `0.0.0.0`**：等于把 3425/3430 挂到公网，CF 的限速、WAF、以后可能加的 Access 全部可被绕过。
+
+> 早期这节写的是「openresty 只在 frontend 网络、必须绑 0.0.0.0」，实测不成立——openresty 同时在 `backend` 网络（`172.19.0.6`），绑 `172.19.0.1` 完全可用，且更安全。
 
 ### 已部署实例（2026-11-05）
 
@@ -108,8 +120,12 @@ proxy_pass http://172.19.0.1:3430;
 |---|---|
 | 域名 | `ai.kilvn.com`（CF 橙云，Flexible 回源） |
 | 反代 | `/www/laradock/nginx/sites/ai.kilvn.com.conf` → `172.19.0.1:3430` |
+| 绑定 | `MAGPIE_BIND=172.19.0.1`（公网不可直连） |
 | 数据 | `/root/.laradock/data/magpie`（65532 属主） |
 | 网关 | `https://ai.kilvn.com/v1`（3430 同时服务控制台与 API） |
+| 升级 | 每 10 分钟 cron，蓝绿切换，已实测 450 次采样零失败 |
+
+> 蓝绿期间临时容器只发布 `172.19.0.1:13430`，不接管 3425。走域名的客户端完全无感；如果有客户端直连 `3425`，在正式容器重建的 1–2 秒里会断。
 
 注意：`nginx/sites/*.conf` 被 `nginx/sites/.gitignore` 排除（`*.conf`），vhost 属于每台机器自己的配置，**不在仓库里同步**，换机器时按 `example/nginx.magpie.conf` 重新放一份。
 
