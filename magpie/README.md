@@ -58,7 +58,7 @@ git fetch origin local && git checkout local && git pull
 ```ini
 ### magpie ###
 MAGPIE_VERSION=latest
-MAGPIE_BIND=127.0.0.1          # 反代走容器网络 magpie:3430，宿主不需要对外
+MAGPIE_BIND=0.0.0.0            # 反代走宿主网关 172.19.0.1:3430，必须绑 0.0.0.0
 MAGPIE_PORT=3425
 MAGPIE_WEB_PORT=3430
 MAGPIE_WEB_KEY=<openssl rand -hex 16>
@@ -73,6 +73,45 @@ docker logs -f laradock-magpie-1
 ```
 
 > 服务器上如果 laradock 有本地改动，先 `git status` 看清楚再拉，别直接覆盖。
+
+### 数据目录属主（必做）
+
+镜像以 `nonroot`（uid 65532）运行。`${DATA_PATH_HOST}/magpie` 如果是 root 建的目录，容器会一直报：
+
+```
+plugins.yml: mkdir /config/magpie: permission denied
+catalog: mkdir /config/cache: permission denied
+```
+
+修法（任选其一，推荐 chown）：
+
+```bash
+sudo chown -R 65532:65532 /root/.laradock/data/magpie   # 推荐
+sudo chmod 777 /root/.laradock/data/magpie              # 省事，但入口目录对所有人可写
+```
+
+容器健康检查不碰磁盘，所以报这个错时状态仍显示 `healthy`，别被误导。
+
+### 网络：反代为什么写 172.19.0.1
+
+laradock 的 `openresty` 只加入 `frontend` 网络，`magpie` 在 `backend` 网络，容器名互相解析不到。所以 vhost 里写宿主网关 IP：
+
+```nginx
+proxy_pass http://172.19.0.1:3430;
+```
+
+想让配置更干净，可以把 openresty 也加进 backend 网络，然后改成 `http://magpie:3430`。
+
+### 已部署实例（2026-11-05）
+
+| 项 | 值 |
+|---|---|
+| 域名 | `ai.kilvn.com`（CF 橙云，Flexible 回源） |
+| 反代 | `/www/laradock/nginx/sites/ai.kilvn.com.conf` → `172.19.0.1:3430` |
+| 数据 | `/root/.laradock/data/magpie`（65532 属主） |
+| 网关 | `https://ai.kilvn.com/v1`（3430 同时服务控制台与 API） |
+
+注意：`nginx/sites/*.conf` 被 `nginx/sites/.gitignore` 排除（`*.conf`），vhost 属于每台机器自己的配置，**不在仓库里同步**，换机器时按 `example/nginx.magpie.conf` 重新放一份。
 
 ### Flexible 的两个前提
 
