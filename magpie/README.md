@@ -165,7 +165,39 @@ glibc 系列（`libc`/`libpthread`/`libdl`/`libm`）**不要**打进包，用容
 docker exec laradock-magpie-1 sh -c 'node -v; npm -v; uv --version; uvx --version; git --version'
 ```
 
-已知限制：`playwright` 条目能通过检查并列出 25 个工具，但真正驱动浏览器还需要 Chromium 的系统库（`libnss3`、`libgbm`、`libasound` 等），官方镜像里没有，只能走派生镜像。
+### playwright 资源库：Chromium 系统库
+
+`playwright` 条目（`npx -y @playwright/mcp@latest`）真正驱动浏览器还需要 Chromium 的系统库，官方镜像里 `libnss3`、`libgbm`、`libasound`、`libX11` 等全都没有，而容器是非 root（uid 65532），跑不了 `npx playwright install --with-deps`。
+
+同样是提取后挂载，不改镜像：
+
+```bash
+# 在 debian:12 里装齐依赖，把 chrome 与 chrome-headless-shell 的 ldd 依赖库抽出来
+sudo docker run --rm -v <已下载的浏览器目录>:/pw:ro \
+  -v /root/.laradock/data/magpie-runtime:/out -v ./pw-bundle.sh:/bundle.sh:ro \
+  --entrypoint bash debian:12 /bundle.sh
+```
+
+`pw-bundle.sh` 做三件事：`apt-get install` Chromium 依赖 → 对两个可执行文件跑 `ldd` 抽出所有 `/lib/...` 库（**排除 glibc 系列**：`libc.so.6`/`libpthread`/`libdl`/`libm`/`libresolv`/`librt`，用容器自带的避免版本冲突）→ 拷字体到 `pw/fonts`。产出约 34MB。
+
+`docker-compose.yml` 里已声明：
+
+```yaml
+        - ${DATA_PATH_HOST}/magpie-runtime/pw:/opt/pw:ro
+      environment:
+        LD_LIBRARY_PATH: "/opt/pw/lib"
+        PLAYWRIGHT_BROWSERS_PATH: "/config/cache/pw-browsers"
+```
+
+Chromium 本体（697MB）**不进运行时目录**，由首次使用时的 `npx playwright install chromium` 下到 `/config/cache/pw-browsers`（rsync 排除，升级不复制）。
+
+验证：
+
+```bash
+docker exec laradock-magpie-1 sh -c 'ldd $PLAYWRIGHT_BROWSERS_PATH/chromium_headless_shell-*/chrome-headless-shell-linux-arm64/chrome-headless-shell | grep "not found"'
+```
+
+无输出即依赖齐全。
 
 ### 网络：反代为什么写 172.19.0.1
 

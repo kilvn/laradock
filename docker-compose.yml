@@ -3022,6 +3022,8 @@ services:
         - ${DATA_PATH_HOST}/magpie-runtime/uv:/opt/uv:ro
         # git 只给「git」资源库条目用；包装脚本把库与 exec-path 都指到 /opt/git
         - ${DATA_PATH_HOST}/magpie-runtime/git:/opt/git:ro
+        # playwright 资源库要的 Chromium 系统库（镜像里没有，且非 root 装不了）
+        - ${DATA_PATH_HOST}/magpie-runtime/pw:/opt/pw:ro
       ports:
         - "${MAGPIE_BIND}:${MAGPIE_PORT}:3425"
         - "${MAGPIE_BIND}:${MAGPIE_WEB_PORT}:3430"
@@ -3033,6 +3035,10 @@ services:
         MAGPIE_WEB_KEY: "${MAGPIE_WEB_KEY}"
         # magpie 用 LookPath 找 npx/uvx 拉起资源库 MCP，必须进 PATH
         PATH: "/opt/git/bin:/opt/node/bin:/opt/uv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        # 只加 Chromium 依赖库目录；glibc 系列刻意没打进去，不影响 node/git
+        LD_LIBRARY_PATH: "/opt/pw/lib"
+        # Chromium 本体由 npx playwright install 下到这里（rsync 排除，升级不复制）
+        PLAYWRIGHT_BROWSERS_PATH: "/config/cache/pw-browsers"
         # npm/uv 的包缓存指向 /config/cache（升级时 rsync 排除，不随容器重建）
         npm_config_cache: "/config/cache/npm"
         UV_CACHE_DIR: "/config/cache/uv"
