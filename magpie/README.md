@@ -96,6 +96,46 @@ sudo chmod 777 /root/.laradock/data/magpie              # 省事，但入口目�
 
 容器健康检查不碰磁盘，所以报这个错时状态仍显示 `healthy`，别被误导。
 
+### 资源库前置依赖：node / uv（必做）
+
+官方镜像基于 Debian 12，**除 `/magpie` 外没有任何运行时**：node、npm、npx、python3、uv、uvx、git 全都没有。
+magpie 的「资源库」用 `exec.LookPath` 找 `npx` / `uvx` 拉起 MCP 服务（源码 `internal/library/mcp_check.go` 的 `stdioProgram`），找不到就报 `notfound`，所以新增资源库条目时会提示找不到 npx/uvx。
+
+不改镜像（自建镜像会让「pull 上游 latest + 比对镜像 ID」的蓝绿升级失效），改为把运行时挂进容器：
+
+```bash
+sudo mkdir -p /root/.laradock/data/magpie-runtime/{node,uv}
+# Node 22（含 npm/npx），官方 arm64 tarball，需要 glibc ≥ 2.28（Debian 12 是 2.36）
+sudo curl -fsSL https://nodejs.org/dist/v22.23.4/node-v22.23.4-linux-arm64.tar.xz \
+  | sudo tar -xJ -C /root/.laradock/data/magpie-runtime/node --strip-components=1
+# uv / uvx（静态二进制）
+sudo curl -fsSL https://github.com/astral-sh/uv/releases/download/0.9.2/uv-aarch64-unknown-linux-gnu.tar.gz \
+  | sudo tar -xz -C /root/.laradock/data/magpie-runtime/uv --strip-components=1
+```
+
+`docker-compose.yml` 里已声明：
+
+```yaml
+      volumes:
+        - ${DATA_PATH_HOST}/magpie-runtime/node:/opt/node:ro
+        - ${DATA_PATH_HOST}/magpie-runtime/uv:/opt/uv:ro
+      environment:
+        PATH: "/opt/node/bin:/opt/uv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        npm_config_cache: "/config/cache/npm"
+        UV_CACHE_DIR: "/config/cache/uv"
+        UV_PYTHON_INSTALL_DIR: "/config/cache/uv-python"
+```
+
+- 缓存都落在 `/config/cache`：升级时 rsync 排除该目录，不随容器重建丢包、也不扩大复制量。
+- `npx -y <包>` 安装的 MCP 包在 `/config/magpie/mcp-npm/`（共享数据卷），升级不丢，magpie 自己按天清理没在用的。
+- 缺运行时的时候蓝绿脚本会直接放弃升级（`magpie.sh` 开头检查 `node/bin/npx`、`uv/uvx`），不会把「缺运行时」变成一次难查的升级。
+
+验证：
+
+```bash
+docker exec laradock-magpie-1 sh -c 'node -v; npm -v; uv --version; uvx --version'
+```
+
 ### 网络：反代为什么写 172.19.0.1
 
 宿主机在 laradock 网桥上有一个固定地址 `172.19.0.1`。magpie 端口绑到这个地址后：
