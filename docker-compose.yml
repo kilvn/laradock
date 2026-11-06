@@ -3020,6 +3020,8 @@ services:
         #（见 magpie/README.md「资源库前置依赖」；官方 Debian 基础镜像无 node/python）
         - ${DATA_PATH_HOST}/magpie-runtime/node:/opt/node:ro
         - ${DATA_PATH_HOST}/magpie-runtime/uv:/opt/uv:ro
+        # git 只给「git」资源库条目用；包装脚本把库与 exec-path 都指到 /opt/git
+        - ${DATA_PATH_HOST}/magpie-runtime/git:/opt/git:ro
       ports:
         - "${MAGPIE_BIND}:${MAGPIE_PORT}:3425"
         - "${MAGPIE_BIND}:${MAGPIE_WEB_PORT}:3430"
@@ -3030,7 +3032,7 @@ services:
         # 不给这个值时，每次启动都会生成新的 Web key
         MAGPIE_WEB_KEY: "${MAGPIE_WEB_KEY}"
         # magpie 用 LookPath 找 npx/uvx 拉起资源库 MCP，必须进 PATH
-        PATH: "/opt/node/bin:/opt/uv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/opt/git/bin:/opt/node/bin:/opt/uv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         # npm/uv 的包缓存指向 /config/cache（升级时 rsync 排除，不随容器重建）
         npm_config_cache: "/config/cache/npm"
         UV_CACHE_DIR: "/config/cache/uv"

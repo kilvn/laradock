@@ -113,14 +113,43 @@ sudo curl -fsSL https://github.com/astral-sh/uv/releases/download/0.9.2/uv-aarch
   | sudo tar -xz -C /root/.laradock/data/magpie-runtime/uv --strip-components=1
 ```
 
+`git` 只给「git」这一个资源库条目用（`uvx mcp-server-git` 真的会调用 git 命令）。从 Debian 包里提取，不改镜像：
+
+```bash
+sudo docker run --rm -v /root/.laradock/data/magpie-runtime:/out debian:12 bash -c \
+  'apt-get update -qq && apt-get install -y -qq --no-install-recommends git ca-certificates
+   mkdir -p /out/git/bin /out/git/lib /out/git/libexec
+   cp /usr/bin/git /out/git/bin/git.real
+   cp -a /usr/lib/git-core /out/git/libexec/git-core
+   cp -a /usr/share/git-core /out/git/share-git-core   # 之后 mv 成 /out/git/share/git-core
+   cp /etc/ssl/certs/ca-certificates.crt /out/git/
+   for b in /usr/bin/git /usr/lib/git-core/git-remote-http /usr/lib/git-core/git-remote-https; do
+     [ -x "$b" ] && ldd "$b"; done | awk "/=> \//{print \$3}" | sort -u |
+   while read l; do case "$(basename $l)" in libc.so.6|libpthread.so.0|libdl.so.2|libm.so.6|libresolv.so.2|librt.so.1|ld-linux*) continue;; esac; cp -L "$l" /out/git/lib/; done'
+```
+
+再放一个包装脚本 `.../magpie-runtime/git/bin/git`（`git.real` 才是真二进制）：
+
+```sh
+#!/bin/sh
+export LD_LIBRARY_PATH=/opt/git/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export GIT_EXEC_PATH=/opt/git/libexec/git-core
+export GIT_SSL_CAINFO=/opt/git/ca-certificates.crt
+export GIT_TEMPLATE_DIR=/opt/git/share/git-core/templates
+exec /opt/git/bin/git.real "$@"
+```
+
+glibc 系列（`libc`/`libpthread`/`libdl`/`libm`）**不要**打进包，用容器自带的，否则容易版本冲突。
+
 `docker-compose.yml` 里已声明：
 
 ```yaml
       volumes:
         - ${DATA_PATH_HOST}/magpie-runtime/node:/opt/node:ro
         - ${DATA_PATH_HOST}/magpie-runtime/uv:/opt/uv:ro
+        - ${DATA_PATH_HOST}/magpie-runtime/git:/opt/git:ro
       environment:
-        PATH: "/opt/node/bin:/opt/uv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/opt/git/bin:/opt/node/bin:/opt/uv:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         npm_config_cache: "/config/cache/npm"
         UV_CACHE_DIR: "/config/cache/uv"
         UV_PYTHON_INSTALL_DIR: "/config/cache/uv-python"
@@ -133,8 +162,10 @@ sudo curl -fsSL https://github.com/astral-sh/uv/releases/download/0.9.2/uv-aarch
 验证：
 
 ```bash
-docker exec laradock-magpie-1 sh -c 'node -v; npm -v; uv --version; uvx --version'
+docker exec laradock-magpie-1 sh -c 'node -v; npm -v; uv --version; uvx --version; git --version'
 ```
+
+已知限制：`playwright` 条目能通过检查并列出 25 个工具，但真正驱动浏览器还需要 Chromium 的系统库（`libnss3`、`libgbm`、`libasound` 等），官方镜像里没有，只能走派生镜像。
 
 ### 网络：反代为什么写 172.19.0.1
 
