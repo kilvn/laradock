@@ -90,6 +90,17 @@ RUN set -xe; \
 
 #
 #--------------------------------------------------------------------------
+# Timezone Aliases
+#--------------------------------------------------------------------------
+# Debian 12+ / Ubuntu 24.04+ 把 PRC、US/*、Japan 等向后兼容时区别名拆到了
+# tzdata-legacy 包。PHP 以 --with-system-tzdata 编译时直接读 /usr/share/zoneinfo，
+# 缺少该包会导致 date_default_timezone_set('PRC') 报 Unknown or bad timezone (PRC)。
+RUN apt-get update -yqq && \
+    (apt-get install -yqq tzdata-legacy || apt-get install -yqq tzdata) && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+#
+#--------------------------------------------------------------------------
 # Optional Software's Installation
 #--------------------------------------------------------------------------
 #
