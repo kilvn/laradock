@@ -189,7 +189,7 @@ sudo docker run --rm -v <已下载的浏览器目录>:/pw:ro \
         PLAYWRIGHT_BROWSERS_PATH: "/config/cache/pw-browsers"
 ```
 
-Chromium 本体（697MB）**不进运行时目录**，由首次使用时的 `npx playwright install chromium` 下到 `/config/cache/pw-browsers`（rsync 排除，升级不复制）。
+Chromium 本体（407MB，playwright 1.65-alpha 锁定的 chromium-1252）已放进 `$RUNTIME_DIR/pw/chrome/`，通过 `/config/cache/pw-mcp.json`（`executablePath=/opt/pw/chrome/chrome`、`chromiumSandbox: false`，容器内无沙箱内核）注入 @playwright/mcp；该配置文件 rsync 排除、升级不复制。
 
 验证：
 

@@ -3038,7 +3038,7 @@ services:
         # 只加 Chromium 依赖库目录；glibc 系列刻意没打进去，不影响 node/git
         LD_LIBRARY_PATH: "/opt/pw/lib"
         # Chromium 本体由 npx playwright install 下到这里（rsync 排除，升级不复制）
-        PLAYWRIGHT_BROWSERS_PATH: "/config/cache/pw-browsers"
+        PLAYWRIGHT_MCP_CONFIG: "/config/cache/pw-mcp.json"
         # npm/uv 的包缓存指向 /config/cache（升级时 rsync 排除，不随容器重建）
         npm_config_cache: "/config/cache/npm"
         UV_CACHE_DIR: "/config/cache/uv"
